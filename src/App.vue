@@ -4,6 +4,10 @@
 
   <!-- CANVAS ABOVE: AR WITH THREE.JS -->
   <canvas width="600" height="600" id="threeCanvas"></canvas>
+
+  <a href="https://github.com/ClarkThyLord/Vox-Face">
+    <img src="../public/vox-face.svg" alt="" class="vf-icon" />
+  </a>
 </template>
 
 <script>
@@ -89,6 +93,15 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+.vf-icon {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  width: 64px;
+  height: 64px;
+  z-index: 10000;
 }
 
 a {
