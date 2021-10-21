@@ -1,6 +1,6 @@
 <p align="center">
 	<a>
-		<img width="128px" src="./public/favicon.ico?sanitize=true" alt="" />
+		<img width="128px" src="./public/vox-face.svg?sanitize=true" alt="" />
 		<h1 align="center">
 			Vox-Face
 		</h1>
