@@ -1,9 +1,10 @@
 <template>
-  <!-- CANVAS BEHIND: VIDEO FACEFILTER ONLY -->
   <canvas width="600" height="600" id="jeeFaceFilterCanvas"></canvas>
 
-  <!-- CANVAS ABOVE: AR WITH THREE.JS -->
   <canvas width="600" height="600" id="threeCanvas"></canvas>
+
+  <canvas width="300" height="300" id="faceCanvas"></canvas>
+  <img src="" alt="FACE" id="faceImage" />
 
   <a href="https://github.com/ClarkThyLord/Vox-Face">
     <img src="../public/vox-face.svg" alt="" class="vf-icon" />
@@ -12,8 +13,6 @@
 
 <script>
 import "../public/libs/js/jeelizFaceFilter";
-import * as THREE from "three/build/three.module.js";
-
 import JeelizThreeHelper from "./helpers/JeelizThreeHelper";
 import JeelizResizer from "./helpers/JeelizResizer";
 
@@ -22,65 +21,110 @@ export default {
   mounted: () => {
     let THREECAMERA = null;
 
-    // callback: launched if a face is detected or lost
-    function detect_callback(faceIndex, isDetected) {
-      if (isDetected) {
-        console.log("INFO in detect_callback(): DETECTED");
-      } else {
-        console.log("INFO in detect_callback(): LOST");
-      }
-    }
+    JeelizResizer.size_canvas({
+      canvasId: "jeeFaceFilterCanvas",
+      callback: (isError, bestVideoSettings) => {
+        JEELIZFACEFILTER.init({
+          antialias: false,
+          canvasId: "jeeFaceFilterCanvas",
+          NNCPath: "neural_nets/",
+          maxFacesDetected: 1,
+          callbackReady: (errCode, spec) => {
+            if (errCode) {
+              console.log("AN ERROR HAPPENS. ERR =", errCode);
+              return;
+            }
 
-    // build the 3D. called once when Jeeliz Face Filter is OK:
-    var init_threeScene = (spec) => {
-      spec.threeCanvasId = "threeCanvas"; // enable 2 canvas mode
-      const threeStuffs = JeelizThreeHelper.init(spec, detect_callback);
+            console.log("INFO: JEELIZFACEFILTER IS READY");
+            console.log(spec);
+            window.gl = spec.GL;
+            window.texture = spec.videoTexture;
 
-      // CREATE A CUBE:
-      const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
-      const cubeMaterial = new THREE.MeshNormalMaterial();
-      const threeCube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-      threeCube.frustumCulled = false;
-      threeStuffs.faceObject.add(threeCube);
+            // Create a 2D canvas to store the result
+            window.faceCanvas = document.getElementById("faceCanvas");
+            window.faceContext = faceCanvas.getContext("2d");
 
-      // CREATE THE CAMERA:
-      THREECAMERA = JeelizThreeHelper.create_camera();
-    }; // end init_threeScene()
+            spec.threeCanvasId = "threeCanvas";
+            const threeStuffs = JeelizThreeHelper.init(
+              spec,
+              function (faceIndex, isDetected) {
+                if (isDetected) {
+                  console.log("INFO in detect_callback(): DETECTED");
+                } else {
+                  console.log("INFO in detect_callback(): LOST");
+                }
+              }
+            );
 
-    // entry point:
-    var main = () => {
-      JeelizResizer.size_canvas({
-        canvasId: "jeeFaceFilterCanvas",
-        callback: function (isError, bestVideoSettings) {
-          init_faceFilter(bestVideoSettings);
-        },
-      });
-    };
+            // CREATE A CUBE:
+            const cubeGeometry = new THREE.BoxGeometry(1, 1, 1);
+            const cubeMaterial = new THREE.MeshNormalMaterial();
+            const threeCube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+            threeCube.frustumCulled = false;
+            threeStuffs.faceObject.add(threeCube);
 
-    var init_faceFilter = (videoSettings) => {
-      JEELIZFACEFILTER.init({
-        antialias: false,
-        canvasId: "jeeFaceFilterCanvas",
-        NNCPath: "neural_nets/", // root of NN_DEFAULT.json file
-        maxFacesDetected: 1,
-        callbackReady: function (errCode, spec) {
-          if (errCode) {
-            console.log("AN ERROR HAPPENS. ERR =", errCode);
-            return;
-          }
+            // CREATE THE CAMERA:
+            THREECAMERA = JeelizThreeHelper.create_camera();
+          },
+          callbackTrack: (detectState) => {
+            // var pixels = new Uint8Array(
+            //   spec.GL.drawingBufferWidth * spec.GL.drawingBufferHeight * 4
+            // );
+            // spec.GL.readPixels(
+            //   0,
+            //   0,
+            //   spec.GL.drawingBufferWidth,
+            //   spec.GL.drawingBufferHeight,
+            //   spec.GL.RGBA,
+            //   spec.GL.UNSIGNED_BYTE,
+            //   pixels
+            // );
 
-          console.log("INFO: JEELIZFACEFILTER IS READY");
-          init_threeScene(spec);
-        },
+            // Create a framebuffer backed by the texture
+            let framebuffer = gl.createFramebuffer();
+            gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+            gl.framebufferTexture2D(
+              gl.FRAMEBUFFER,
+              gl.COLOR_ATTACHMENT0,
+              gl.TEXTURE_2D,
+              texture,
+              0
+            );
 
-        // called at each render iteration (drawing loop):
-        callbackTrack: function (detectState) {
-          JeelizThreeHelper.render(detectState, THREECAMERA);
-        },
-      }); //end JEELIZFACEFILTER.init call
-    };
+            // Read the contents of the framebuffer
+            var data = new Uint8Array(
+              gl.drawingBufferWidth * gl.drawingBufferHeight * 4
+            );
+            gl.readPixels(
+              0,
+              0,
+              gl.drawingBufferWidth,
+              gl.drawingBufferHeight,
+              gl.RGBA,
+              gl.UNSIGNED_BYTE,
+              data
+            );
 
-    main();
+            gl.deleteFramebuffer(framebuffer);
+
+            // Copy the pixels to a 2D canvas
+            var imageData = faceContext.createImageData(
+              gl.drawingBufferWidth,
+              gl.drawingBufferHeight
+            );
+            imageData.data.set(data);
+            faceContext.putImageData(imageData, 0, 0);
+
+            let img = document.getElementById("faceImage");
+            img.src = faceCanvas.toDataURL();
+
+            // console.log(detectState);
+
+            JeelizThreeHelper.render(detectState, THREECAMERA);
+          },
+        });
+      },
+    });
   },
 };
 </script>
@@ -149,5 +193,21 @@ body {
     top: 60px;
     transform: rotateY(180deg);
   }
+}
+
+#faceCanvas {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  z-index: 100000;
+  background: greenyellow;
+}
+
+#faceImage {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  z-index: 100000;
+  background: greenyellow;
 }
 </style>
