@@ -18,11 +18,9 @@
   </div>
 
   <canvas id="jeeFaceFilterCanvas"></canvas>
-
   <canvas :class="{ 'd-none': !showModel }" id="threeCanvas"></canvas>
 
-  <canvas id="faceCanvas"></canvas>
-  <img :class="{ 'd-none': !showDebug }" alt="" id="faceImage" />
+  <canvas :class="{ 'd-none': !showDebug }" id="debugCanvas"></canvas>
 
   <a href="https://github.com/ClarkThyLord/Vox-Face">
     <img src="../public/vox-face.svg" alt="Vox-Face" class="vf-icon" />
@@ -33,6 +31,14 @@
 import "../public/libs/js/jeelizFaceFilter";
 import JeelizThreeHelper from "./helpers/JeelizThreeHelper";
 import JeelizResizer from "./helpers/JeelizResizer";
+
+import * as THREE from "three/build/three.module.js";
+window.THREE = THREE;
+
+import * as faceapi from "face-api.js";
+window.faceapi = faceapi;
+faceapi.loadTinyFaceDetectorModel("/neural_nets");
+faceapi.loadFaceLandmarkTinyModel("/neural_nets");
 
 export default {
   name: "App",
@@ -65,11 +71,10 @@ export default {
             window.gl = spec.GL;
             window.texture = spec.videoTexture;
 
-            // Create a 2D canvas to store the result
-            window.faceCanvas = document.getElementById("faceCanvas");
-            window.faceContext = faceCanvas.getContext("2d");
-            faceContext.canvas.width = window.innerWidth;
-            faceContext.canvas.height = window.innerHeight;
+            window.debugCanvas = document.getElementById("debugCanvas");
+            window.debugContext = debugCanvas.getContext("2d");
+            window.debugContext.canvas.width = window.innerWidth;
+            window.debugContext.canvas.height = window.innerHeight;
 
             spec.threeCanvasId = "threeCanvas";
             const threeStuffs = JeelizThreeHelper.init(
@@ -78,36 +83,59 @@ export default {
                 if (isDetected) {
                   console.log("INFO in detect_callback(): DETECTED");
 
-                  let framebuffer = gl.createFramebuffer();
-                  gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-                  gl.framebufferTexture2D(
-                    gl.FRAMEBUFFER,
-                    gl.COLOR_ATTACHMENT0,
-                    gl.TEXTURE_2D,
+                  let framebuffer = window.gl.createFramebuffer();
+                  window.gl.bindFramebuffer(window.gl.FRAMEBUFFER, framebuffer);
+                  window.gl.framebufferTexture2D(
+                    window.gl.FRAMEBUFFER,
+                    window.gl.COLOR_ATTACHMENT0,
+                    window.gl.TEXTURE_2D,
                     texture,
                     0
                   );
 
-                  var data = new Uint8Array(
-                    gl.drawingBufferWidth * gl.drawingBufferHeight * 4
+                  let data = new Uint8Array(
+                    window.gl.drawingBufferWidth *
+                      window.gl.drawingBufferHeight *
+                      4
                   );
-                  gl.readPixels(
+                  window.gl.readPixels(
                     0,
                     0,
-                    gl.drawingBufferWidth,
-                    gl.drawingBufferHeight,
-                    gl.RGBA,
-                    gl.UNSIGNED_BYTE,
+                    window.gl.drawingBufferWidth,
+                    window.gl.drawingBufferHeight,
+                    window.gl.RGBA,
+                    window.gl.UNSIGNED_BYTE,
                     data
                   );
 
-                  gl.deleteFramebuffer(framebuffer);
+                  window.gl.deleteFramebuffer(framebuffer);
 
-                  var imageData = faceContext.createImageData(
-                    gl.drawingBufferWidth,
-                    gl.drawingBufferHeight
+                  let imageData = window.debugContext.createImageData(
+                    window.gl.drawingBufferWidth,
+                    window.gl.drawingBufferHeight
                   );
                   imageData.data.set(data);
+                  // window.debugContext.putImageData(imageData, 0, 0);
+
+                  // faceapi
+                  //   .detectSingleFace(
+                  //     window.debugCanvas,
+                  //     new faceapi.TinyFaceDetectorOptions()
+                  //   )
+                  //   .withFaceLandmarks(true)
+                  //   .then(
+                  //     (result) => {
+                  //       console.log("FACE-API SUCCESS", result);
+
+                  //       faceapi.draw.drawDetections(debugCanvas, result, {
+                  //         withScore: true,
+                  //       });
+                  //       faceapi.draw.drawFaceLandmarks(debugCanvas, result);
+                  //     },
+                  //     (error) => {
+                  //       console.log("FACE-API FAILED", error);
+                  //     }
+                  //   );
 
                   for (let i = 0; i < imageData.data.length; i += 4) {
                     const red = imageData.data[i];
@@ -138,10 +166,7 @@ export default {
                     }
                   }
 
-                  faceContext.putImageData(imageData, 0, 0);
-
-                  let img = document.getElementById("faceImage");
-                  img.src = faceCanvas.toDataURL();
+                  window.debugContext.putImageData(imageData, 0, 0);
                 } else {
                   console.log("INFO in detect_callback(): LOST");
                 }
@@ -171,8 +196,8 @@ export default {
               );
               JEELIZFACEFILTER.resize();
 
-              faceContext.canvas.width = window.innerWidth;
-              faceContext.canvas.height = window.innerHeight;
+              window.debugContext.canvas.width = window.innerWidth;
+              window.debugContext.canvas.height = window.innerHeight;
             });
           },
           callbackTrack: (detectState) => {
@@ -222,23 +247,12 @@ export default {
   transform: rotateY(180deg);
 }
 
-#faceCanvas {
-  z-index: -1;
-  /* display: none; */
-  position: absolute;
-  left: 0px;
-  top: 0px;
-  width: 100%;
-  height: 100%;
-  transform: rotateY(180deg);
-}
-
-#faceImage {
+#debugCanvas {
   z-index: 2;
   position: absolute;
   right: 0px;
   top: 0px;
-  width: 25%;
+  max-height: 25%;
   transform: rotateY(180deg);
 }
 </style>
