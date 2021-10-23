@@ -21,7 +21,7 @@
 
   <canvas :class="{ 'd-none': !showModel }" id="threeCanvas"></canvas>
 
-  <canvas :class="{ 'd-none': !showDebug }" id="faceCanvas"></canvas>
+  <canvas id="faceCanvas"></canvas>
   <img :class="{ 'd-none': !showDebug }" alt="" id="faceImage" />
 
   <a href="https://github.com/ClarkThyLord/Vox-Face">
@@ -108,6 +108,14 @@ export default {
                     gl.drawingBufferHeight
                   );
                   imageData.data.set(data);
+
+                  for (let i = 0; i < imageData.data.length; i += 4) {
+                    const red = imageData.data[i];
+                    const green = imageData.data[i + 1];
+                    const blue = imageData.data[i + 2];
+                    const alpha = imageData.data[i + 3];
+                  }
+
                   faceContext.putImageData(imageData, 0, 0);
 
                   let img = document.getElementById("faceImage");
