@@ -114,6 +114,28 @@ export default {
                     const green = imageData.data[i + 1];
                     const blue = imageData.data[i + 2];
                     const alpha = imageData.data[i + 3];
+
+                    const delta = 128;
+                    const Y = 0.299 * red + 0.587 * green + 0.114 * blue;
+                    const Cr = (red - Y) * 0.713 + delta;
+                    const Cb = (blue - Y) * 0.564 + delta;
+                    // imageData.data[i] = Y + 1.403 * (Cr - delta);
+                    // imageData.data[i + 1] =
+                    //   Y - 0.714 * (Cr - delta) - 0.344 * (Cb - delta);
+                    // imageData.data[i + 2] = Y + 1.773 * (Cb - delta);
+
+                    if (
+                      Y >= 0.0 &&
+                      Y <= 235.0 &&
+                      Cr >= 133.0 &&
+                      Cr <= 173.0 &&
+                      Cb >= 77.0 &&
+                      Cb <= 127.0
+                    ) {
+                      imageData.data[i] = 255;
+                      imageData.data[i + 1] = 0;
+                      imageData.data[i + 2] = 0;
+                    }
                   }
 
                   faceContext.putImageData(imageData, 0, 0);
@@ -202,7 +224,7 @@ export default {
 
 #faceCanvas {
   z-index: -1;
-  display: none;
+  /* display: none; */
   position: absolute;
   left: 0px;
   top: 0px;
