@@ -61,7 +61,7 @@ export default {
             }
 
             console.log("INFO: JEELIZFACEFILTER IS READY");
-            console.log(spec);
+
             window.gl = spec.GL;
             window.texture = spec.videoTexture;
 
@@ -90,6 +90,20 @@ export default {
 
             // CREATE THE CAMERA:
             THREECAMERA = JeelizThreeHelper.create_camera();
+
+            window.addEventListener("resize", () => {
+              window.gl.canvas.width = window.innerWidth;
+              window.gl.canvas.height = window.innerHeight;
+
+              THREECAMERA.aspect = window.innerWidth / window.innerHeight;
+              THREECAMERA.updateProjectionMatrix();
+
+              threeStuffs.renderer.setSize(
+                window.innerWidth,
+                window.innerHeight
+              );
+              JEELIZFACEFILTER.resize();
+            });
           },
           callbackTrack: (detectState) => {
             // var pixels = new Uint8Array(
@@ -142,8 +156,6 @@ export default {
 
             let img = document.getElementById("faceImage");
             img.src = faceCanvas.toDataURL();
-
-            // console.log(detectState);
 
             JeelizThreeHelper.render(detectState, THREECAMERA);
           },
