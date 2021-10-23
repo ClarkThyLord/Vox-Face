@@ -39,7 +39,7 @@ export default {
   data: () => {
     return {
       showModel: true,
-      showDebug: false,
+      showDebug: true,
     };
   },
   mounted: () => {
@@ -68,6 +68,8 @@ export default {
             // Create a 2D canvas to store the result
             window.faceCanvas = document.getElementById("faceCanvas");
             window.faceContext = faceCanvas.getContext("2d");
+            faceContext.canvas.width = window.innerWidth;
+            faceContext.canvas.height = window.innerHeight;
 
             spec.threeCanvasId = "threeCanvas";
             const threeStuffs = JeelizThreeHelper.init(
@@ -75,6 +77,41 @@ export default {
               function (faceIndex, isDetected) {
                 if (isDetected) {
                   console.log("INFO in detect_callback(): DETECTED");
+
+                  let framebuffer = gl.createFramebuffer();
+                  gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+                  gl.framebufferTexture2D(
+                    gl.FRAMEBUFFER,
+                    gl.COLOR_ATTACHMENT0,
+                    gl.TEXTURE_2D,
+                    texture,
+                    0
+                  );
+
+                  var data = new Uint8Array(
+                    gl.drawingBufferWidth * gl.drawingBufferHeight * 4
+                  );
+                  gl.readPixels(
+                    0,
+                    0,
+                    gl.drawingBufferWidth,
+                    gl.drawingBufferHeight,
+                    gl.RGBA,
+                    gl.UNSIGNED_BYTE,
+                    data
+                  );
+
+                  gl.deleteFramebuffer(framebuffer);
+
+                  var imageData = faceContext.createImageData(
+                    gl.drawingBufferWidth,
+                    gl.drawingBufferHeight
+                  );
+                  imageData.data.set(data);
+                  faceContext.putImageData(imageData, 0, 0);
+
+                  let img = document.getElementById("faceImage");
+                  img.src = faceCanvas.toDataURL();
                 } else {
                   console.log("INFO in detect_callback(): LOST");
                 }
@@ -103,60 +140,12 @@ export default {
                 window.innerHeight
               );
               JEELIZFACEFILTER.resize();
+
+              faceContext.canvas.width = window.innerWidth;
+              faceContext.canvas.height = window.innerHeight;
             });
           },
           callbackTrack: (detectState) => {
-            // var pixels = new Uint8Array(
-            //   spec.GL.drawingBufferWidth * spec.GL.drawingBufferHeight * 4
-            // );
-            // spec.GL.readPixels(
-            //   0,
-            //   0,
-            //   spec.GL.drawingBufferWidth,
-            //   spec.GL.drawingBufferHeight,
-            //   spec.GL.RGBA,
-            //   spec.GL.UNSIGNED_BYTE,
-            //   pixels
-            // );
-
-            // Create a framebuffer backed by the texture
-            let framebuffer = gl.createFramebuffer();
-            gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-            gl.framebufferTexture2D(
-              gl.FRAMEBUFFER,
-              gl.COLOR_ATTACHMENT0,
-              gl.TEXTURE_2D,
-              texture,
-              0
-            );
-
-            // Read the contents of the framebuffer
-            var data = new Uint8Array(
-              gl.drawingBufferWidth * gl.drawingBufferHeight * 4
-            );
-            gl.readPixels(
-              0,
-              0,
-              gl.drawingBufferWidth,
-              gl.drawingBufferHeight,
-              gl.RGBA,
-              gl.UNSIGNED_BYTE,
-              data
-            );
-
-            gl.deleteFramebuffer(framebuffer);
-
-            // Copy the pixels to a 2D canvas
-            var imageData = faceContext.createImageData(
-              gl.drawingBufferWidth,
-              gl.drawingBufferHeight
-            );
-            imageData.data.set(data);
-            faceContext.putImageData(imageData, 0, 0);
-
-            let img = document.getElementById("faceImage");
-            img.src = faceCanvas.toDataURL();
-
             JeelizThreeHelper.render(detectState, THREECAMERA);
           },
         });
@@ -204,14 +193,14 @@ export default {
 }
 
 #faceCanvas {
-  z-index: 2;
+  z-index: -1;
+  display: none;
   position: absolute;
   left: 0px;
   top: 0px;
-  /* width: 100%;
-  height: 100%; */
+  width: 100%;
+  height: 100%;
   transform: rotateY(180deg);
-  background: greenyellow;
 }
 
 #faceImage {
@@ -219,7 +208,7 @@ export default {
   position: absolute;
   right: 0px;
   top: 0px;
+  width: 25%;
   transform: rotateY(180deg);
-  background: greenyellow;
 }
 </style>
