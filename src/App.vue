@@ -1,10 +1,28 @@
 <template>
+  <div class="btn-group options">
+    <input
+      v-model="showModel"
+      type="checkbox"
+      class="btn-check"
+      id="btncheck1"
+    />
+    <label class="btn btn-outline-primary" for="btncheck1">Model</label>
+
+    <input
+      v-model="showDebug"
+      type="checkbox"
+      class="btn-check"
+      id="btncheck2"
+    />
+    <label class="btn btn-outline-primary" for="btncheck2">Debug</label>
+  </div>
+
   <canvas id="jeeFaceFilterCanvas"></canvas>
 
-  <canvas id="threeCanvas"></canvas>
+  <canvas :class="{ 'd-none': !showModel }" id="threeCanvas"></canvas>
 
-  <canvas id="faceCanvas"></canvas>
-  <img alt="" id="faceImage" />
+  <canvas :class="{ 'd-none': !showDebug }" id="faceCanvas"></canvas>
+  <img :class="{ 'd-none': !showDebug }" alt="" id="faceImage" />
 
   <a href="https://github.com/ClarkThyLord/Vox-Face">
     <img src="../public/vox-face.svg" alt="Vox-Face" class="vf-icon" />
@@ -18,6 +36,12 @@ import JeelizResizer from "./helpers/JeelizResizer";
 
 export default {
   name: "App",
+  data: () => {
+    return {
+      showModel: true,
+      showDebug: false,
+    };
+  },
   mounted: () => {
     let THREECAMERA = null;
 
@@ -29,6 +53,7 @@ export default {
           canvasId: "jeeFaceFilterCanvas",
           NNCPath: "neural_nets/",
           maxFacesDetected: 1,
+          videoSettings: bestVideoSettings,
           callbackReady: (errCode, spec) => {
             if (errCode) {
               console.log("AN ERROR HAPPENS. ERR =", errCode);
@@ -130,6 +155,13 @@ export default {
 </script>
 
 <style>
+.options {
+  z-index: 10;
+  position: absolute;
+  top: 12px;
+  left: 12px;
+}
+
 .vf-icon {
   position: absolute;
   bottom: 0px;
