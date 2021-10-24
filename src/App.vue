@@ -57,6 +57,7 @@ window.human = new Human({
 
 import {
   Mesh,
+  BoxGeometry,
   MeshBasicMaterial,
   OrthographicCamera,
   Scene,
@@ -96,7 +97,7 @@ export default {
     const camera = new OrthographicCamera();
 
     const scene = new Scene();
-    const mesh = new Mesh(
+    const faceMesh = new Mesh(
       new FaceGeometry(human.faceTriangulation),
       new MeshBasicMaterial({
         color: 0xffaaaa,
@@ -104,6 +105,12 @@ export default {
       })
     );
     scene.add(mesh);
+
+    const isLive = (input) =>
+      input.srcObject &&
+      input.srcObject.getVideoTracks()[0].readyState === "live" &&
+      input.readyState > 2 &&
+      !input.paused;
 
     const updateSize = () => {
       camera.left = -window.innerWidth / 2;
@@ -116,12 +123,6 @@ export default {
 
       renderer.setSize(window.innerWidth, window.innerHeight);
     };
-
-    const isLive = (input) =>
-      input.srcObject &&
-      input.srcObject.getVideoTracks()[0].readyState === "live" &&
-      input.readyState > 2 &&
-      !input.paused;
 
     (async () => {
       window.addEventListener("unhandledrejection", (evt) => {
@@ -169,15 +170,15 @@ export default {
           if (isLive(input)) {
             const res = await human.detect(input);
             if (res?.face?.length > 0) {
-              mesh.visible = this.showWireframe;
+              faceMesh.visible = this.showWireframe;
               if (this.showWireframe)
-                mesh.geometry.update(
+                faceMesh.geometry.update(
                   input.videoWidth,
                   input.videoHeight,
                   res.face[0]
                 );
             } else {
-              mesh.visible = false;
+              faceMesh.visible = false;
             }
             renderer.render(scene, camera);
           }
