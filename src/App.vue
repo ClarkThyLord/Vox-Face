@@ -56,17 +56,15 @@ window.human = new Human({
 });
 
 import {
-  DoubleSide,
   Mesh,
   MeshBasicMaterial,
   OrthographicCamera,
   Scene,
   sRGBEncoding,
-  VideoTexture,
   WebGLRenderer,
-  BufferGeometry,
-  BufferAttribute,
 } from "three";
+
+import FaceGeometry from "./js/FaceGeometry";
 
 export default {
   name: "App",
@@ -77,6 +75,7 @@ export default {
     return {
       showModel: true,
       showRender: true,
+      showWireframe: true,
     };
   },
   mounted() {
@@ -85,11 +84,7 @@ export default {
       Cookies.set("seenAbout", true, { expires: 7 });
     }
 
-    const wireframe = false;
-
     window.mainCanvas = document.getElementById("mainCanvas");
-    let width = 0;
-    let height = 0;
 
     const renderer = new WebGLRenderer({
       antialias: true,
@@ -100,58 +95,27 @@ export default {
 
     const camera = new OrthographicCamera();
 
-    const materialWireFrame = new MeshBasicMaterial({
-      color: 0xffaaaa,
-      wireframe: true,
-    });
-    const materialFace = new MeshBasicMaterial({
-      color: 0xffffff,
-      side: DoubleSide,
-      map: null,
-    });
-
-    class FaceGeometry extends BufferGeometry {
-      constructor(triangulation) {
-        super();
-        this.positions = new Float32Array(478 * 3);
-        this.uvs = new Float32Array(478 * 2);
-        this.setAttribute("position", new BufferAttribute(this.positions, 3));
-        this.setAttribute("uv", new BufferAttribute(this.uvs, 2));
-        this.setIndex(triangulation);
-      }
-
-      update(face) {
-        let ptr = 0;
-        for (const p of face.mesh) {
-          this.positions[ptr + 0] = -p[0] + width / 2;
-          this.positions[ptr + 1] = height - p[1] - height / 2;
-          this.positions[ptr + 2] = -p[2];
-          ptr += 3;
-        }
-        ptr = 0;
-        for (const p of face.meshRaw) {
-          this.uvs[ptr + 0] = 0 + p[0];
-          this.uvs[ptr + 1] = 1 - p[1];
-          ptr += 2;
-        }
-        materialFace.map.update();
-        this.attributes.position.needsUpdate = true;
-        this.attributes.uv.needsUpdate = true;
-        this.computeVertexNormals();
-      }
-    }
-
     const scene = new Scene();
-    const faceGeometry = new FaceGeometry(human.faceTriangulation);
-    const mesh = new Mesh(faceGeometry, materialFace);
+    const mesh = new Mesh(
+      new FaceGeometry(human.faceTriangulation),
+      new MeshBasicMaterial({
+        color: 0xffaaaa,
+        wireframe: true,
+      })
+    );
     scene.add(mesh);
 
-    function updateSize() {
+    const updateSize = () => {
+      camera.left = -window.innerWidth / 2;
+      camera.right = window.innerWidth / 2;
+      camera.top = window.innerHeight / 2;
+      camera.bottom = -window.innerHeight / 2;
+
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
 
       renderer.setSize(window.innerWidth, window.innerHeight);
-    }
+    };
 
     const isLive = (input) =>
       input.srcObject &&
@@ -159,39 +123,14 @@ export default {
       input.readyState > 2 &&
       !input.paused;
 
-    async function render(input) {
-      if (isLive(input)) {
-        if (width !== input.videoWidth || height !== input.videoHeight) {
-          width = input.videoWidth;
-          height = input.videoHeight;
-          camera.left = -width / 2;
-          camera.right = width / 2;
-          camera.top = height / 2;
-          camera.bottom = -height / 2;
-          camera.near = -100;
-          camera.far = 100;
-          // camera.zoom = 2;
-          updateSize();
-        }
+    (async () => {
+      window.addEventListener("unhandledrejection", (evt) => {
+        console.error(evt.reason || evt);
+        evt.preventDefault();
+      });
 
-        const res = await human.detect(input);
-        if (res?.face?.length > 0) {
-          faceGeometry.update(res.face[0]);
-          mesh.material = materialFace;
-          renderer.autoClear = true;
-          renderer.render(scene, camera);
+      await human.load();
 
-          if (wireframe) {
-            mesh.material = materialWireFrame;
-            renderer.autoClear = false;
-            renderer.render(scene, camera);
-          }
-        }
-      }
-      requestAnimationFrame(() => render(input));
-    }
-
-    async function setupCameraFeed() {
       if (!navigator.mediaDevices) return null;
 
       window.cameraFeed = document.getElementById("cameraFeed");
@@ -208,37 +147,42 @@ export default {
           aspectRatio: 1920 / 1080,
         },
       };
-      // if (window.innerWidth > window.innerHeight)
-      //   constraints.video.width = { ideal: window.innerWidth };
-      // else constraints.video.height = { ideal: window.innerHeight };
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       if (stream) window.cameraFeed.srcObject = stream;
       else return null;
 
-      return new Promise((resolve) => {
+      const video = await new Promise((resolve) => {
         window.cameraFeed.onloadeddata = async () => {
           window.cameraFeed.play();
           resolve(window.cameraFeed);
         };
       });
-    }
 
-    (async function main() {
-      window.addEventListener("unhandledrejection", (evt) => {
-        console.error(evt.reason || evt);
-        evt.preventDefault();
-      });
-
-      await human.load();
-      const video = await setupCameraFeed();
       if (video) {
+        camera.near = -100;
+        camera.far = 100;
+
         updateSize();
         window.addEventListener("resize", updateSize);
 
-        const videoTexture = new VideoTexture(video);
-        videoTexture.encoding = sRGBEncoding;
-        materialFace.map = videoTexture;
-
+        const render = async (input) => {
+          if (isLive(input)) {
+            const res = await human.detect(input);
+            if (res?.face?.length > 0) {
+              mesh.visible = this.showWireframe;
+              if (this.showWireframe)
+                mesh.geometry.update(
+                  input.videoWidth,
+                  input.videoHeight,
+                  res.face[0]
+                );
+            } else {
+              mesh.visible = false;
+            }
+            renderer.render(scene, camera);
+          }
+          requestAnimationFrame(() => render(input));
+        };
         render(video);
       }
     })();
