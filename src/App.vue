@@ -65,7 +65,6 @@ import {
   Scene,
   sRGBEncoding,
   WebGLRenderer,
-  Vector3,
 } from "three";
 
 import FaceGeometry from "./js/FaceGeometry";
@@ -98,8 +97,8 @@ export default {
     window.threeRenderer.outputEncoding = sRGBEncoding;
 
     window.threeCamera = new OrthographicCamera();
-    window.threeCamera.near = -100;
-    window.threeCamera.far = 100;
+    window.threeCamera.near = -1000;
+    window.threeCamera.far = 1000;
 
     window.threeScene = new Scene();
 
