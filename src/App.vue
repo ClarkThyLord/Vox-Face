@@ -38,8 +38,8 @@ import About from "/src/components/About.vue";
 
 import Human from "@vladmandic/human/dist/human.esm";
 window.human = new Human({
-  modelBasePath: "models/",
   backend: "webgl",
+  modelBasePath: "models/",
   face: {
     enabled: true,
     detector: { rotation: true, maxDetected: 1 },
@@ -104,7 +104,14 @@ export default {
         wireframe: true,
       })
     );
+    scene.add(faceMesh);
+
+    const geometry = new BoxGeometry(50, 50, 50);
+    const material = new MeshBasicMaterial({ color: 0xffff00 });
+    const mesh = new Mesh(geometry, material);
     scene.add(mesh);
+
+    console.log(mesh);
 
     const isLive = (input) =>
       input.srcObject &&
@@ -170,12 +177,25 @@ export default {
           if (isLive(input)) {
             const res = await human.detect(input);
             if (res?.face?.length > 0) {
+              console.log("HUMAN RESPONSE", res);
+              const face = res.face[0];
+
+              // mesh.position.x = -face.box[0] + face.box[2];
+              // mesh.position.y = -face.box[1];
+
+              mesh.rotation.set(
+                face.rotation?.angle?.pitch || 0.0,
+                face.rotation?.angle?.yaw || 0.0,
+                face.rotation?.angle?.roll || 0.0,
+                "XYZ"
+              );
+
               faceMesh.visible = this.showWireframe;
               if (this.showWireframe)
                 faceMesh.geometry.update(
                   input.videoWidth,
                   input.videoHeight,
-                  res.face[0]
+                  face
                 );
             } else {
               faceMesh.visible = false;
