@@ -4,7 +4,10 @@ import {
 import App from './App.vue';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
-import * as boostrap from 'bootstrap';
-window.bootstrap = boostrap;
+import * as Boostrap from 'bootstrap';
+window.Bootstrap = Boostrap;
+
+import Cookies from 'js-cookie';
+window.Cookies = Cookies;
 
 createApp(App).mount('#app');

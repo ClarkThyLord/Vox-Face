@@ -45,7 +45,7 @@ export default {
     };
   },
   mounted() {
-    this._modal = new window.bootstrap.Modal(document.getElementById("About"));
+    this._modal = new window.Bootstrap.Modal(document.getElementById("About"));
   },
   methods: {
     show() {

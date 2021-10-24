@@ -46,7 +46,10 @@ export default {
     };
   },
   mounted() {
-    this.showAbout();
+    if (window.Cookies.get("seenAbout") === undefined) {
+      this.showAbout();
+      Cookies.set("seenAbout", true, { expires: 7 });
+    }
   },
   methods: {
     showAbout() {
