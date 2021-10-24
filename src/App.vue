@@ -89,6 +89,8 @@ export default {
 
     window.threeCanvas = document.getElementById("threeCanvas");
     window.humanCanvas = document.getElementById("humanCanvas");
+    window.segmentationCanvas = document.getElementById("segmentationCanvas");
+    window.segmentationContext = window.segmentationCanvas.getContext("2d");
 
     window.threeRenderer = new WebGLRenderer({
       antialias: true,
@@ -205,24 +207,64 @@ export default {
               voxFaceMesh.scale.x = voxFaceMesh.scale.y;
               voxFaceMesh.scale.z = voxFaceMesh.scale.y;
 
-              window.segmentationCanvas =
-                document.getElementById("segmentationCanvas");
-              window.segmentationCanvas.width = face.box[2];
-              window.segmentationCanvas.height = face.box[3];
-              window.segmentationContext =
-                window.segmentationContext ||
-                window.segmentationCanvas.getContext("2d");
-              window.segmentationContext.drawImage(
-                cameraVideo,
-                face.box[0],
-                face.box[1],
-                face.box[2],
-                face.box[3],
-                0,
-                0,
-                window.segmentationCanvas.width,
-                window.segmentationCanvas.height
-              );
+              if (face.box[2] > 0 && face.box[3] > 0) {
+                window.segmentationCanvas.width = face.box[2];
+                window.segmentationCanvas.height = face.box[3];
+                window.segmentationContext.drawImage(
+                  cameraVideo,
+                  face.box[0],
+                  face.box[1],
+                  face.box[2],
+                  face.box[3],
+                  0,
+                  0,
+                  window.segmentationCanvas.width,
+                  window.segmentationCanvas.height
+                );
+
+                console.debug(
+                  0,
+                  0,
+                  window.segmentationCanvas.width,
+                  window.segmentationCanvas.height
+                );
+
+                const imageData = window.segmentationContext.getImageData(
+                  0,
+                  0,
+                  window.segmentationCanvas.width,
+                  window.segmentationCanvas.height
+                );
+                for (let i = 0; i < imageData.data.length; i += 4) {
+                  const red = imageData.data[i];
+                  const green = imageData.data[i + 1];
+                  const blue = imageData.data[i + 2];
+                  const alpha = imageData.data[i + 3];
+
+                  const delta = 128;
+                  const Y = 0.299 * red + 0.587 * green + 0.114 * blue;
+                  const Cr = (red - Y) * 0.713 + delta;
+                  const Cb = (blue - Y) * 0.564 + delta;
+                  // imageData.data[i] = Y + 1.403 * (Cr - delta);
+                  // imageData.data[i + 1] =
+                  //   Y - 0.714 * (Cr - delta) - 0.344 * (Cb - delta);
+                  // imageData.data[i + 2] = Y + 1.773 * (Cb - delta);
+
+                  if (
+                    Y >= 0.0 &&
+                    Y <= 235.0 &&
+                    Cr >= 133.0 &&
+                    Cr <= 173.0 &&
+                    Cb >= 77.0 &&
+                    Cb <= 127.0
+                  ) {
+                    imageData.data[i] = 255;
+                    imageData.data[i + 1] = 0;
+                    imageData.data[i + 2] = 0;
+                  }
+                }
+                window.segmentationContext.putImageData(imageData, 0, 0);
+              }
 
               if (this.debugMode) {
                 window.humanCanvas.width = input.videoWidth;
@@ -321,6 +363,5 @@ main {
   right: 0px;
   top: 0px;
   width: 9%;
-  height: 16%;
 }
 </style>
