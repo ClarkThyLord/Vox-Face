@@ -30,6 +30,7 @@
   <main>
     <video id="cameraFeed"></video>
     <canvas id="mainCanvas"></canvas>
+    <canvas id="debugCanvas"></canvas>
   </main>
 </template>
 
@@ -63,6 +64,7 @@ import {
   Scene,
   sRGBEncoding,
   WebGLRenderer,
+  Vector3,
 } from "three";
 
 import FaceGeometry from "./js/FaceGeometry";
@@ -111,7 +113,7 @@ export default {
     const mesh = new Mesh(geometry, material);
     scene.add(mesh);
 
-    console.log(mesh);
+    console.debug(mesh);
 
     const isLive = (input) =>
       input.srcObject &&
@@ -177,11 +179,20 @@ export default {
           if (isLive(input)) {
             const res = await human.detect(input);
             if (res?.face?.length > 0) {
-              console.log("HUMAN RESPONSE", res);
+              const interpolated = human.next(res);
               const face = res.face[0];
 
-              // mesh.position.x = -face.box[0] + face.box[2];
-              // mesh.position.y = -face.box[1];
+              let center = face?.boxRaw;
+              if (Array.isArray(center) && center?.length > 0) {
+                // mesh.position.x = -(center[0] * window.innerWidth) / 2;
+                // mesh.position.y = -center[1] * window.innerHeight;
+                // console.debug(mesh.position);
+              }
+
+              let debugCanvas = document.getElementById("debugCanvas");
+              debugCanvas.width = input.videoWidth;
+              debugCanvas.height = input.videoHeight;
+              human.draw.face(debugCanvas, res.face);
 
               mesh.rotation.set(
                 face.rotation?.angle?.pitch || 0.0,
@@ -191,12 +202,19 @@ export default {
               );
 
               faceMesh.visible = this.showWireframe;
-              if (this.showWireframe)
+              if (this.showWireframe) {
                 faceMesh.geometry.update(
                   input.videoWidth,
                   input.videoHeight,
                   face
                 );
+                faceMesh.geometry.computeBoundingBox();
+                let center = faceMesh.geometry.boundingBox.getCenter(
+                  new Vector3()
+                );
+                mesh.position.copy(center);
+                console.debug(center);
+              }
             } else {
               faceMesh.visible = false;
             }
@@ -258,7 +276,7 @@ main {
   position: absolute;
   min-height: 100%;
   min-width: 100%;
-  transform: translate(-50%, 0) rotateY(180deg);
+  transform: translate(-50%, 0);
 }
 
 #mainCanvas {
@@ -268,5 +286,15 @@ main {
   top: 0px;
   width: 100%;
   height: 100%;
+  transform: rotateY(180deg);
+}
+
+#debugCanvas {
+  z-index: 2;
+  left: 50%;
+  position: absolute;
+  min-height: 100%;
+  min-width: 100%;
+  transform: translate(-50%, 0);
 }
 </style>
