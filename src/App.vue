@@ -31,6 +31,7 @@
     <video id="cameraVideo"></video>
     <canvas id="threeCanvas"></canvas>
     <canvas :class="{ 'd-none': !debugMode }" id="humanCanvas"></canvas>
+    <canvas :class="{ 'd-none': !debugMode }" id="segmentationCanvas"></canvas>
   </main>
 </template>
 
@@ -204,6 +205,25 @@ export default {
               voxFaceMesh.scale.x = voxFaceMesh.scale.y;
               voxFaceMesh.scale.z = voxFaceMesh.scale.y;
 
+              window.segmentationCanvas =
+                document.getElementById("segmentationCanvas");
+              window.segmentationCanvas.width = face.box[2];
+              window.segmentationCanvas.height = face.box[3];
+              window.segmentationContext =
+                window.segmentationContext ||
+                window.segmentationCanvas.getContext("2d");
+              window.segmentationContext.drawImage(
+                cameraVideo,
+                face.box[0],
+                face.box[1],
+                face.box[2],
+                face.box[3],
+                0,
+                0,
+                window.segmentationCanvas.width,
+                window.segmentationCanvas.height
+              );
+
               if (this.debugMode) {
                 window.humanCanvas.width = input.videoWidth;
                 window.humanCanvas.height = input.videoHeight;
@@ -293,5 +313,14 @@ main {
   min-height: 100%;
   min-width: 100%;
   transform: translate(-50%, 0);
+}
+
+#segmentationCanvas {
+  z-index: 4;
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  width: 9%;
+  height: 16%;
 }
 </style>
