@@ -60,6 +60,7 @@ import {
   Mesh,
   BoxGeometry,
   MeshBasicMaterial,
+  MeshNormalMaterial,
   OrthographicCamera,
   Scene,
   sRGBEncoding,
@@ -113,8 +114,8 @@ export default {
     window.threeScene.add(faceMesh);
 
     const voxFaceMesh = new Mesh(
-      new BoxGeometry(50, 50, 50),
-      new MeshBasicMaterial({ color: 0xffff00 })
+      new BoxGeometry(1, 1, 1),
+      new MeshNormalMaterial()
     );
     voxFaceMesh.visible = false;
     window.threeScene.add(voxFaceMesh);
@@ -191,10 +192,6 @@ export default {
                 face
               );
               faceMesh.geometry.computeBoundingBox();
-              // let center = faceMesh.geometry.boundingBox.getCenter(
-              //   new Vector3()
-              // );
-              // voxFaceMesh.position.copy(center);
 
               faceMesh.geometry.boundingBox.getCenter(voxFaceMesh.position);
               voxFaceMesh.rotation.set(
@@ -203,6 +200,10 @@ export default {
                 face.rotation?.angle?.roll || 0.0,
                 "XYZ"
               );
+              faceMesh.geometry.boundingBox.getSize(voxFaceMesh.scale);
+              voxFaceMesh.scale.y *= 1.25;
+              voxFaceMesh.scale.x = voxFaceMesh.scale.y;
+              voxFaceMesh.scale.z = voxFaceMesh.scale.y;
 
               if (this.debugMode) {
                 window.humanCanvas.width = input.videoWidth;
