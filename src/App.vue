@@ -9,12 +9,12 @@
     <label class="btn btn-outline-primary" for="btncheck1">Model</label>
 
     <input
-      v-model="showDebug"
+      v-model="debugMode"
       type="checkbox"
       class="btn-check"
       id="btncheck2"
     />
-    <label class="btn btn-outline-primary" for="btncheck2">Render</label>
+    <label class="btn btn-outline-primary" for="btncheck2">Debug</label>
 
     <button @click="showAbout" type="button" class="btn btn-outline-secondary">
       About
@@ -28,9 +28,9 @@
   <About ref="about" />
 
   <main>
-    <video id="cameraFeed"></video>
-    <canvas id="mainCanvas"></canvas>
-    <canvas id="debugCanvas"></canvas>
+    <video id="cameraVideo"></video>
+    <canvas id="threeCanvas"></canvas>
+    <canvas :class="{ 'd-none': !debugMode }" id="humanCanvas"></canvas>
   </main>
 </template>
 
@@ -77,8 +77,7 @@ export default {
   data() {
     return {
       showModel: true,
-      showRender: true,
-      showWireframe: true,
+      debugMode: true,
     };
   },
   mounted() {
@@ -87,18 +86,22 @@ export default {
       Cookies.set("seenAbout", true, { expires: 7 });
     }
 
-    window.mainCanvas = document.getElementById("mainCanvas");
+    window.threeCanvas = document.getElementById("threeCanvas");
+    window.humanCanvas = document.getElementById("humanCanvas");
 
-    const renderer = new WebGLRenderer({
+    window.threeRenderer = new WebGLRenderer({
       antialias: true,
       alpha: true,
-      canvas: window.mainCanvas,
+      canvas: window.threeCanvas,
     });
-    renderer.outputEncoding = sRGBEncoding;
+    window.threeRenderer.outputEncoding = sRGBEncoding;
 
-    const camera = new OrthographicCamera();
+    window.threeCamera = new OrthographicCamera();
+    window.threeCamera.near = -100;
+    window.threeCamera.far = 100;
 
-    const scene = new Scene();
+    window.threeScene = new Scene();
+
     const faceMesh = new Mesh(
       new FaceGeometry(human.faceTriangulation),
       new MeshBasicMaterial({
@@ -106,14 +109,15 @@ export default {
         wireframe: true,
       })
     );
-    scene.add(faceMesh);
+    faceMesh.visible = false;
+    window.threeScene.add(faceMesh);
 
-    const geometry = new BoxGeometry(50, 50, 50);
-    const material = new MeshBasicMaterial({ color: 0xffff00 });
-    const mesh = new Mesh(geometry, material);
-    scene.add(mesh);
-
-    console.debug(mesh);
+    const voxFaceMesh = new Mesh(
+      new BoxGeometry(50, 50, 50),
+      new MeshBasicMaterial({ color: 0xffff00 })
+    );
+    voxFaceMesh.visible = false;
+    window.threeScene.add(voxFaceMesh);
 
     const isLive = (input) =>
       input.srcObject &&
@@ -122,15 +126,15 @@ export default {
       !input.paused;
 
     const updateSize = () => {
-      camera.left = -window.innerWidth / 2;
-      camera.right = window.innerWidth / 2;
-      camera.top = window.innerHeight / 2;
-      camera.bottom = -window.innerHeight / 2;
+      window.threeCamera.left = -window.innerWidth / 2;
+      window.threeCamera.right = window.innerWidth / 2;
+      window.threeCamera.top = window.innerHeight / 2;
+      window.threeCamera.bottom = -window.innerHeight / 2;
 
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
+      window.threeCamera.aspect = window.innerWidth / window.innerHeight;
+      window.threeCamera.updateProjectionMatrix();
 
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      window.threeRenderer.setSize(window.innerWidth, window.innerHeight);
     };
 
     (async () => {
@@ -143,10 +147,10 @@ export default {
 
       if (!navigator.mediaDevices) return null;
 
-      window.cameraFeed = document.getElementById("cameraFeed");
-      window.mainCanvas.addEventListener("click", () => {
-        if (isLive(window.cameraFeed)) window.cameraFeed.pause();
-        else window.cameraFeed.play();
+      window.cameraVideo = document.getElementById("cameraVideo");
+      window.threeCanvas.addEventListener("click", () => {
+        if (isLive(window.cameraVideo)) window.cameraVideo.pause();
+        else window.cameraVideo.play();
       });
       const constraints = {
         audio: false,
@@ -158,68 +162,61 @@ export default {
         },
       };
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      if (stream) window.cameraFeed.srcObject = stream;
+      if (stream) window.cameraVideo.srcObject = stream;
       else return null;
 
       const video = await new Promise((resolve) => {
-        window.cameraFeed.onloadeddata = async () => {
-          window.cameraFeed.play();
-          resolve(window.cameraFeed);
+        window.cameraVideo.onloadeddata = async () => {
+          window.cameraVideo.play();
+          resolve(window.cameraVideo);
         };
       });
 
       if (video) {
-        camera.near = -100;
-        camera.far = 100;
-
         updateSize();
         window.addEventListener("resize", updateSize);
 
         const render = async (input) => {
+          let rendered = false;
+
           if (isLive(input)) {
             const res = await human.detect(input);
             if (res?.face?.length > 0) {
               const interpolated = human.next(res);
               const face = res.face[0];
 
-              let center = face?.boxRaw;
-              if (Array.isArray(center) && center?.length > 0) {
-                // mesh.position.x = -(center[0] * window.innerWidth) / 2;
-                // mesh.position.y = -center[1] * window.innerHeight;
-                // console.debug(mesh.position);
-              }
+              faceMesh.geometry.update(
+                input.videoWidth,
+                input.videoHeight,
+                face
+              );
+              faceMesh.geometry.computeBoundingBox();
+              // let center = faceMesh.geometry.boundingBox.getCenter(
+              //   new Vector3()
+              // );
+              // voxFaceMesh.position.copy(center);
 
-              let debugCanvas = document.getElementById("debugCanvas");
-              debugCanvas.width = input.videoWidth;
-              debugCanvas.height = input.videoHeight;
-              human.draw.face(debugCanvas, res.face);
-
-              mesh.rotation.set(
+              faceMesh.geometry.boundingBox.getCenter(voxFaceMesh.position);
+              voxFaceMesh.rotation.set(
                 face.rotation?.angle?.pitch || 0.0,
                 face.rotation?.angle?.yaw || 0.0,
                 face.rotation?.angle?.roll || 0.0,
                 "XYZ"
               );
 
-              faceMesh.visible = this.showWireframe;
-              if (this.showWireframe) {
-                faceMesh.geometry.update(
-                  input.videoWidth,
-                  input.videoHeight,
-                  face
-                );
-                faceMesh.geometry.computeBoundingBox();
-                let center = faceMesh.geometry.boundingBox.getCenter(
-                  new Vector3()
-                );
-                mesh.position.copy(center);
-                console.debug(center);
+              if (this.debugMode) {
+                window.humanCanvas.width = input.videoWidth;
+                window.humanCanvas.height = input.videoHeight;
+                human.draw.face(window.humanCanvas, res.face);
               }
-            } else {
-              faceMesh.visible = false;
+
+              rendered = true;
             }
-            renderer.render(scene, camera);
           }
+
+          voxFaceMesh.visible = rendered && this.showModel;
+
+          window.threeRenderer.render(window.threeScene, window.threeCamera);
           requestAnimationFrame(() => render(input));
         };
         render(video);
@@ -270,8 +267,8 @@ main {
   min-width: 100%;
 }
 
-#cameraFeed {
-  z-index: 0;
+#cameraVideo {
+  z-index: 1;
   left: 50%;
   position: absolute;
   min-height: 100%;
@@ -279,8 +276,8 @@ main {
   transform: translate(-50%, 0);
 }
 
-#mainCanvas {
-  z-index: 1;
+#threeCanvas {
+  z-index: 2;
   position: absolute;
   left: 0px;
   top: 0px;
@@ -289,8 +286,8 @@ main {
   transform: rotateY(180deg);
 }
 
-#debugCanvas {
-  z-index: 2;
+#humanCanvas {
+  z-index: 3;
   left: 50%;
   position: absolute;
   min-height: 100%;
