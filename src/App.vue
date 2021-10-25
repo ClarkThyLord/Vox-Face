@@ -77,9 +77,37 @@ export default {
   },
   data() {
     return {
-      showModel: true,
-      debugMode: true,
+      _showModel: window.Cookies.get("showModel") === "false" ? false : true,
+      _debugMode: window.Cookies.get("debugMode") === "false" ? false : true,
     };
+  },
+  computed: {
+    showModel: {
+      get() {
+        return this.$data._showModel;
+      },
+      set(value) {
+        Cookies.set("showModel", value);
+        this.$data._showModel = value;
+      },
+    },
+    debugMode: {
+      get() {
+        return this.$data._debugMode;
+      },
+      set(value) {
+        Cookies.set("debugMode", value);
+        this.$data._debugMode = value;
+      },
+    },
+  },
+  methods: {
+    showAbout() {
+      this.$refs.about.show();
+    },
+    hideAbout() {
+      this.$refs.about.hide();
+    },
   },
   mounted() {
     if (window.Cookies.get("seenAbout") === undefined) {
@@ -303,14 +331,6 @@ export default {
         render(video);
       }
     })();
-  },
-  methods: {
-    showAbout() {
-      this.$refs.about.show();
-    },
-    hideAbout() {
-      this.$refs.about.hide();
-    },
   },
 };
 </script>
