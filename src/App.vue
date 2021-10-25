@@ -115,12 +115,13 @@ export default {
     faceMesh.visible = false;
     window.threeScene.add(faceMesh);
 
-    const voxFaceMesh = new Mesh(
+    window.voxFaceMesh = new Mesh(
       new BoxGeometry(1, 1, 1),
-      new MeshNormalMaterial()
+      new MeshBasicMaterial()
+      // new MeshNormalMaterial()
     );
-    voxFaceMesh.visible = false;
-    window.threeScene.add(voxFaceMesh);
+    window.voxFaceMesh.visible = false;
+    window.threeScene.add(window.voxFaceMesh);
 
     const isLive = (input) =>
       input.srcObject &&
@@ -195,17 +196,19 @@ export default {
               );
               faceMesh.geometry.computeBoundingBox();
 
-              faceMesh.geometry.boundingBox.getCenter(voxFaceMesh.position);
-              voxFaceMesh.rotation.set(
+              faceMesh.geometry.boundingBox.getCenter(
+                window.voxFaceMesh.position
+              );
+              window.voxFaceMesh.rotation.set(
                 face.rotation?.angle?.pitch || 0.0,
                 face.rotation?.angle?.yaw || 0.0,
                 face.rotation?.angle?.roll || 0.0,
                 "XYZ"
               );
-              faceMesh.geometry.boundingBox.getSize(voxFaceMesh.scale);
-              voxFaceMesh.scale.y *= 1.25;
-              voxFaceMesh.scale.x = voxFaceMesh.scale.y;
-              voxFaceMesh.scale.z = voxFaceMesh.scale.y;
+              faceMesh.geometry.boundingBox.getSize(window.voxFaceMesh.scale);
+              window.voxFaceMesh.scale.y *= 1.25;
+              window.voxFaceMesh.scale.x = window.voxFaceMesh.scale.y;
+              window.voxFaceMesh.scale.z = window.voxFaceMesh.scale.y;
 
               if (face.box[2] > 0 && face.box[3] > 0) {
                 window.segmentationCanvas.width = face.box[2];
@@ -222,19 +225,16 @@ export default {
                   window.segmentationCanvas.height
                 );
 
-                console.debug(
-                  0,
-                  0,
-                  window.segmentationCanvas.width,
-                  window.segmentationCanvas.height
-                );
-
                 const imageData = window.segmentationContext.getImageData(
                   0,
                   0,
                   window.segmentationCanvas.width,
                   window.segmentationCanvas.height
                 );
+
+                let rT = 0,
+                  gT = 0,
+                  bT = 0;
                 for (let i = 0; i < imageData.data.length; i += 4) {
                   const red = imageData.data[i];
                   const green = imageData.data[i + 1];
@@ -258,11 +258,30 @@ export default {
                     Cb >= 77.0 &&
                     Cb <= 127.0
                   ) {
+                    rT += red;
+                    gT += green;
+                    bT += blue;
+
                     imageData.data[i] = 255;
                     imageData.data[i + 1] = 0;
                     imageData.data[i + 2] = 0;
                   }
                 }
+
+                rT /= imageData.data.length / 4;
+                gT /= imageData.data.length / 4;
+                bT /= imageData.data.length / 4;
+
+                const rgb =
+                  "rgb(" +
+                  Math.round(rT) +
+                  ", " +
+                  Math.round(gT) +
+                  ", " +
+                  Math.round(bT) +
+                  ")";
+                window.voxFaceMesh.material.color.set(rgb);
+
                 window.segmentationContext.putImageData(imageData, 0, 0);
               }
 
@@ -276,7 +295,7 @@ export default {
             }
           }
 
-          voxFaceMesh.visible = rendered && this.showModel;
+          window.voxFaceMesh.visible = rendered && this.showModel;
 
           window.threeRenderer.render(window.threeScene, window.threeCamera);
           requestAnimationFrame(() => render(input));
