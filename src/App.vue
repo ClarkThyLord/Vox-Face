@@ -338,7 +338,8 @@ export default {
 <style>
 html,
 body,
-#app {
+#app,
+main {
   widows: 100%;
   height: 100%;
   overflow: hidden;
