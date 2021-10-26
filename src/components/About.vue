@@ -113,7 +113,7 @@ export default {
     return {
       _modal: undefined,
       _showDebugOptions:
-        window.Cookies.get("showDebugOptions") === "false" ? false : true,
+        window.Cookies.get("showDebugOptions") === "true" ? true : false,
       debugOptions: window.debugOptions,
     };
   },

@@ -77,7 +77,7 @@ export default {
   data() {
     return {
       _showModel: window.Cookies.get("showModel") === "false" ? false : true,
-      _debugMode: window.Cookies.get("debugMode") === "false" ? false : true,
+      _debugMode: window.Cookies.get("debugMode") === "true" ? true : false,
     };
   },
   computed: {
