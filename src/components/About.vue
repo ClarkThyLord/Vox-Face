@@ -3,7 +3,12 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-body">
-          <img src="vox-face.svg" alt="" class="rounded mx-auto d-block" />
+          <img
+            @dblclick="showDebugOptions = !showDebugOptions"
+            src="vox-face.svg"
+            alt=""
+            class="rounded mx-auto d-block"
+          />
           <h2 class="text-center">Vox-Face</h2>
 
           <p class="fst-normal text-center">
@@ -18,6 +23,67 @@
               GitHub
             </a>
           </p>
+
+          <div v-if="showDebugOptions">
+            <div class="form-check form-switch">
+              <input
+                type="checkbox"
+                role="switch"
+                v-model="debugOptions.drawBoxes"
+                class="form-check-input"
+                id="drawBoxes"
+              />
+              <label class="form-check-label" for="drawBoxes">
+                Draw Boxes
+              </label>
+            </div>
+            <div class="form-check form-switch">
+              <input
+                type="checkbox"
+                role="switch"
+                v-model="debugOptions.drawPoints"
+                class="form-check-input"
+                id="drawPoints"
+              />
+              <label class="form-check-label" for="drawPoints">
+                Draw Points
+              </label>
+            </div>
+            <div class="form-check form-switch">
+              <input
+                type="checkbox"
+                role="switch"
+                v-model="debugOptions.drawPolygons"
+                class="form-check-input"
+                id="drawPolygons"
+              />
+              <label class="form-check-label" for="drawPolygons">
+                Draw Polygons
+              </label>
+            </div>
+            <div class="form-check form-switch">
+              <input
+                type="checkbox"
+                role="switch"
+                v-model="debugOptions.drawGaze"
+                class="form-check-input"
+                id="drawGaze"
+              />
+              <label class="form-check-label" for="drawGaze"> Draw Gaze </label>
+            </div>
+            <div class="form-check form-switch">
+              <input
+                type="checkbox"
+                role="switch"
+                v-model="debugOptions.drawSegmentation"
+                class="form-check-input"
+                id="drawSegmentation"
+              />
+              <label class="form-check-label" for="drawSegmentation">
+                Draw Segmentation
+              </label>
+            </div>
+          </div>
         </div>
 
         <div class="modal-footer">
@@ -42,7 +108,21 @@ export default {
   data() {
     return {
       _modal: undefined,
+      _showDebugOptions:
+        window.Cookies.get("showDebugOptions") === "false" ? false : true,
+      debugOptions: window.debugOptions,
     };
+  },
+  computed: {
+    showDebugOptions: {
+      get() {
+        return this.$data._showDebugOptions;
+      },
+      set(value) {
+        Cookies.set("showDebugOptions", value);
+        this.$data._showDebugOptions = value;
+      },
+    },
   },
   mounted() {
     this._modal = new window.Bootstrap.Modal(document.getElementById("About"));
