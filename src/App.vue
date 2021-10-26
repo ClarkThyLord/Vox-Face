@@ -61,7 +61,6 @@ import {
   Mesh,
   BoxGeometry,
   MeshBasicMaterial,
-  MeshNormalMaterial,
   OrthographicCamera,
   Scene,
   sRGBEncoding,
@@ -314,6 +313,20 @@ export default {
               }
 
               if (this.debugMode) {
+                window.human.draw.options.drawBoxes =
+                  window.debugOptions.drawBoxes;
+                window.human.draw.options.drawPoints =
+                  window.debugOptions.drawPoints;
+                window.human.draw.options.drawPolygons =
+                  window.debugOptions.drawPolygons;
+                window.human.draw.options.drawGaze =
+                  window.debugOptions.drawGaze;
+
+                window.segmentationCanvas.style.display = window.debugOptions
+                  .drawSegmentation
+                  ? "block"
+                  : "none";
+
                 window.humanCanvas.width = input.videoWidth;
                 window.humanCanvas.height = input.videoHeight;
                 human.draw.face(window.humanCanvas, res.face);
