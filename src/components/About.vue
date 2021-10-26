@@ -24,64 +24,68 @@
             </a>
           </p>
 
-          <div v-if="showDebugOptions">
-            <div class="form-check form-switch">
-              <input
-                type="checkbox"
-                role="switch"
-                v-model="debugOptions.drawBoxes"
-                class="form-check-input"
-                id="drawBoxes"
-              />
-              <label class="form-check-label" for="drawBoxes">
-                Draw Boxes
-              </label>
-            </div>
-            <div class="form-check form-switch">
-              <input
-                type="checkbox"
-                role="switch"
-                v-model="debugOptions.drawPoints"
-                class="form-check-input"
-                id="drawPoints"
-              />
-              <label class="form-check-label" for="drawPoints">
-                Draw Points
-              </label>
-            </div>
-            <div class="form-check form-switch">
-              <input
-                type="checkbox"
-                role="switch"
-                v-model="debugOptions.drawPolygons"
-                class="form-check-input"
-                id="drawPolygons"
-              />
-              <label class="form-check-label" for="drawPolygons">
-                Draw Polygons
-              </label>
-            </div>
-            <div class="form-check form-switch">
-              <input
-                type="checkbox"
-                role="switch"
-                v-model="debugOptions.drawGaze"
-                class="form-check-input"
-                id="drawGaze"
-              />
-              <label class="form-check-label" for="drawGaze"> Draw Gaze </label>
-            </div>
-            <div class="form-check form-switch">
-              <input
-                type="checkbox"
-                role="switch"
-                v-model="debugOptions.drawSegmentation"
-                class="form-check-input"
-                id="drawSegmentation"
-              />
-              <label class="form-check-label" for="drawSegmentation">
-                Draw Segmentation
-              </label>
+          <div v-if="showDebugOptions" class="container debugOptions">
+            <div class="row row-cols-2 justify-content-center mx-5">
+              <div class="form-check form-switch">
+                <input
+                  type="checkbox"
+                  role="switch"
+                  v-model="debugOptions.drawBoxes"
+                  class="form-check-input"
+                  id="drawBoxes"
+                />
+                <label class="form-check-label" for="drawBoxes">
+                  Draw Boxes
+                </label>
+              </div>
+              <div class="form-check form-switch">
+                <input
+                  type="checkbox"
+                  role="switch"
+                  v-model="debugOptions.drawPoints"
+                  class="form-check-input"
+                  id="drawPoints"
+                />
+                <label class="form-check-label" for="drawPoints">
+                  Draw Points
+                </label>
+              </div>
+              <div class="form-check form-switch">
+                <input
+                  type="checkbox"
+                  role="switch"
+                  v-model="debugOptions.drawPolygons"
+                  class="form-check-input"
+                  id="drawPolygons"
+                />
+                <label class="form-check-label" for="drawPolygons">
+                  Draw Polygons
+                </label>
+              </div>
+              <div class="form-check form-switch">
+                <input
+                  type="checkbox"
+                  role="switch"
+                  v-model="debugOptions.drawGaze"
+                  class="form-check-input"
+                  id="drawGaze"
+                />
+                <label class="form-check-label" for="drawGaze">
+                  Draw Gaze
+                </label>
+              </div>
+              <div class="form-check form-switch">
+                <input
+                  type="checkbox"
+                  role="switch"
+                  v-model="debugOptions.drawSegmentation"
+                  class="form-check-input"
+                  id="drawSegmentation"
+                />
+                <label class="form-check-label" for="drawSegmentation">
+                  Draw Segmentation
+                </label>
+              </div>
             </div>
           </div>
         </div>
