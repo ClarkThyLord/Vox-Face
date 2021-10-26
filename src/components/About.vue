@@ -3,12 +3,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-body">
-          <img
-            @dblclick="console.log('debug')"
-            src="vox-face.svg"
-            alt=""
-            class="rounded mx-auto d-block"
-          />
+          <img src="vox-face.svg" alt="" class="rounded mx-auto d-block" />
           <h2 class="text-center">Vox-Face</h2>
 
           <p class="fst-normal text-center">
