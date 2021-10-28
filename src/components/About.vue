@@ -86,6 +86,14 @@
                   Draw Segmentation
                 </label>
               </div>
+
+              <button
+                @click="reset"
+                type="button"
+                class="m-auto btn btn-primary btn-sm"
+              >
+                Reset
+              </button>
             </div>
           </div>
         </div>
@@ -137,6 +145,11 @@ export default {
     },
     hide() {
       if (this._modal) this._modal.hide();
+    },
+    reset() {
+      Object.keys(window.Cookies.get()).forEach(function (cookieName) {
+        Cookies.remove(cookieName);
+      });
     },
   },
 };
