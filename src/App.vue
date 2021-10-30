@@ -170,7 +170,7 @@ export default {
 
     (async () => {
       window.addEventListener("unhandledrejection", (evt) => {
-        console.error(evt.reason || evt);
+        // console.error(evt.reason || evt);
         evt.preventDefault();
       });
 
