@@ -15,7 +15,7 @@
             <i>AR web app for making voxel faces.</i>
           </p>
 
-          <p class="fst-normal text-center">Working on Chrome, Firefox.</p>
+          <p class="fst-normal text-center">Working with Chrome, Firefox.</p>
 
           <p class="text-center">
             <a
