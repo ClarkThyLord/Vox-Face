@@ -12,10 +12,12 @@
           <h2 class="text-center">Vox-Face</h2>
 
           <p class="fst-normal text-center">
-            <i>AR web app for making voxel faces.</i>
+            <i>The Voxel Face AR Web App.</i>
           </p>
 
-          <p class="fst-normal text-center">Working with Chrome, Firefox.</p>
+          <p class="fst-normal text-center text-muted">
+            Supports Chrome, Firefox.
+          </p>
 
           <p class="text-center">
             <a
