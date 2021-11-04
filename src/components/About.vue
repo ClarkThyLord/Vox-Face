@@ -16,7 +16,7 @@
           </p>
 
           <p class="fst-normal text-center text-muted">
-            Supports Chrome, Firefox.
+            Working on Chrome, Firefox.
           </p>
 
           <p class="text-center">
