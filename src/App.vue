@@ -145,7 +145,6 @@ export default {
     window.voxFaceMesh = new Mesh(
       new BoxGeometry(1, 1, 1),
       new MeshBasicMaterial()
-      // new MeshNormalMaterial()
     );
     window.voxFaceMesh.visible = false;
     window.threeScene.add(window.voxFaceMesh);
@@ -170,7 +169,7 @@ export default {
 
     (async () => {
       window.addEventListener("unhandledrejection", (evt) => {
-        // console.error(evt.reason || evt);
+        console.error(evt.reason || evt);
         evt.preventDefault();
       });
 
@@ -272,10 +271,6 @@ export default {
                   const Y = 0.299 * red + 0.587 * green + 0.114 * blue;
                   const Cr = (red - Y) * 0.713 + delta;
                   const Cb = (blue - Y) * 0.564 + delta;
-                  // imageData.data[i] = Y + 1.403 * (Cr - delta);
-                  // imageData.data[i + 1] =
-                  //   Y - 0.714 * (Cr - delta) - 0.344 * (Cb - delta);
-                  // imageData.data[i + 2] = Y + 1.773 * (Cb - delta);
 
                   if (
                     Y >= 0.0 &&
