@@ -144,10 +144,59 @@ export default {
 
     window.voxFaceMesh = new Mesh(
       new BoxGeometry(1, 1, 1),
-      new MeshBasicMaterial()
+      new MeshBasicMaterial({ color: "yellow" })
     );
     window.voxFaceMesh.visible = false;
     window.threeScene.add(window.voxFaceMesh);
+
+    const eyeLeft = new Mesh(
+      new BoxGeometry(0.25, 0.25, 0.25),
+      new MeshBasicMaterial({ color: "red" })
+    );
+    eyeLeft.position.x = -0.25;
+    eyeLeft.position.y = 0.25;
+    eyeLeft.position.z = 0.5;
+    window.voxFaceMesh.add(eyeLeft);
+
+    const eyeRight = new Mesh(
+      new BoxGeometry(0.25, 0.25, 0.25),
+      new MeshBasicMaterial({ color: "red" })
+    );
+    eyeRight.position.x = 0.25;
+    eyeRight.position.y = 0.25;
+    eyeRight.position.z = 0.5;
+    window.voxFaceMesh.add(eyeRight);
+
+    const browLeft = new Mesh(
+      new BoxGeometry(0.25, 0.05, 0.25),
+      new MeshBasicMaterial({ color: "brown" })
+    );
+    browLeft.position.x = -0.25;
+    browLeft.position.y = 0.425;
+    browLeft.position.z = 0.5;
+    window.voxFaceMesh.add(browLeft);
+
+    const browRight = new Mesh(
+      new BoxGeometry(0.25, 0.05, 0.25),
+      new MeshBasicMaterial({ color: "brown" })
+    );
+    browRight.position.x = 0.25;
+    browRight.position.y = 0.425;
+    browRight.position.z = 0.5;
+    window.voxFaceMesh.add(browRight);
+
+    const mouth = new Mesh(
+      new BoxGeometry(0.25, 0.25, 0.25),
+      new MeshBasicMaterial({ color: "green" })
+    );
+    mouth.position.x = 0.0;
+    mouth.position.y = -0.15;
+    mouth.position.z = 0.5;
+    window.voxFaceMesh.add(mouth);
+
+    // window.voxFaceMesh.scale.x *= 100;
+    // window.voxFaceMesh.scale.y *= 100;
+    // window.voxFaceMesh.scale.z *= 100;
 
     const isLive = (input) =>
       input.srcObject &&
