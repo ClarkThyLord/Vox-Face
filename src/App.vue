@@ -65,6 +65,7 @@ import {
   Scene,
   sRGBEncoding,
   WebGLRenderer,
+  FogExp2,
 } from "three";
 
 import FaceGeometry from "./js/FaceGeometry";
@@ -131,6 +132,7 @@ export default {
     window.threeCamera.far = 1000;
 
     window.threeScene = new Scene();
+    window.threeScene.fog = new FogExp2(0xefd1b5, 0.0025);
 
     const faceMesh = new Mesh(
       new FaceGeometry(human.faceTriangulation),
