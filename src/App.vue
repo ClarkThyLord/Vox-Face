@@ -188,17 +188,13 @@ export default {
     window.voxFaceMesh.add(browRight);
 
     const mouth = new Mesh(
-      new BoxGeometry(0.25, 0.25, 0.25),
+      new BoxGeometry(0.35, 0.2, 0.25),
       new MeshBasicMaterial({ color: "green" })
     );
     mouth.position.x = 0.0;
     mouth.position.y = -0.15;
     mouth.position.z = 0.5;
     window.voxFaceMesh.add(mouth);
-
-    // window.voxFaceMesh.scale.x *= 100;
-    // window.voxFaceMesh.scale.y *= 100;
-    // window.voxFaceMesh.scale.z *= 100;
 
     const isLive = (input) =>
       input.srcObject &&
