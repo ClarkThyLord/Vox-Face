@@ -360,6 +360,18 @@ export default {
                 mouth.material.color.set(rgb);
 
                 window.segmentationContext.putImageData(imageData, 0, 0);
+                window.segmentationContext.beginPath();
+                let pos = face.annotations.noseTip[0];
+                console.debug(pos);
+                segmentationContext.arc(
+                  pos[0] / 2,
+                  pos[1] / 2,
+                  50,
+                  0,
+                  2 * Math.PI
+                );
+                window.segmentationContext.fill();
+                window.segmentationContext.stroke();
               }
 
               if (this.debugMode) {
