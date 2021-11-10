@@ -360,18 +360,38 @@ export default {
                 mouth.material.color.set(rgb);
 
                 window.segmentationContext.putImageData(imageData, 0, 0);
+
+                // console.debug(face);
+
                 window.segmentationContext.beginPath();
-                let pos = face.annotations.noseTip[0];
-                console.debug(pos);
+                let leftEyeIrisX =
+                  face.annotations.leftEyeIris[0][0] - face.box[0];
+                let leftEyeIrisY =
+                  face.annotations.leftEyeIris[0][1] - face.box[1];
                 segmentationContext.arc(
-                  pos[0] / 2,
-                  pos[1] / 2,
+                  leftEyeIrisX,
+                  leftEyeIrisY,
                   50,
                   0,
                   2 * Math.PI
                 );
+                window.segmentationContext.fillStyle = "blue";
                 window.segmentationContext.fill();
-                window.segmentationContext.stroke();
+
+                window.segmentationContext.beginPath();
+                let rightEyeIrisX =
+                  face.annotations.rightEyeIris[0][0] - face.box[0];
+                let rightEyeIrisY =
+                  face.annotations.rightEyeIris[0][1] - face.box[1];
+                segmentationContext.arc(
+                  rightEyeIrisX,
+                  rightEyeIrisY,
+                  50,
+                  0,
+                  2 * Math.PI
+                );
+                window.segmentationContext.fillStyle = "blue";
+                window.segmentationContext.fill();
               }
 
               if (this.debugMode) {
