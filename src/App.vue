@@ -361,7 +361,7 @@ export default {
 
                 window.segmentationContext.putImageData(imageData, 0, 0);
 
-                // console.debug(face);
+                console.debug(face);
 
                 window.segmentationContext.beginPath();
                 let leftEyeIrisX =
@@ -391,6 +391,34 @@ export default {
                   2 * Math.PI
                 );
                 window.segmentationContext.fillStyle = "blue";
+                window.segmentationContext.fill();
+
+                window.segmentationContext.beginPath();
+                let leftBrowX =
+                  face.annotations.leftEyebrowUpper[3][0] - face.box[0];
+                let leftBrowY =
+                  face.annotations.leftEyebrowUpper[3][1] - face.box[1];
+                segmentationContext.rect(
+                  leftBrowX - 50,
+                  leftBrowY - 25,
+                  100,
+                  50
+                );
+                window.segmentationContext.fillStyle = "brown";
+                window.segmentationContext.fill();
+
+                window.segmentationContext.beginPath();
+                let rightBrowX =
+                  face.annotations.rightEyebrowUpper[3][0] - face.box[0];
+                let righBrowY =
+                  face.annotations.rightEyebrowUpper[3][1] - face.box[1];
+                segmentationContext.rect(
+                  rightBrowX - 50,
+                  righBrowY - 25,
+                  100,
+                  50
+                );
+                window.segmentationContext.fillStyle = "brown";
                 window.segmentationContext.fill();
               }
 
