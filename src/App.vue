@@ -361,8 +361,6 @@ export default {
 
                 window.segmentationContext.putImageData(imageData, 0, 0);
 
-                console.debug(face);
-
                 window.segmentationContext.beginPath();
                 let leftEyeIrisX =
                   face.annotations.leftEyeIris[0][0] - face.box[0];
@@ -419,6 +417,13 @@ export default {
                   50
                 );
                 window.segmentationContext.fillStyle = "brown";
+                window.segmentationContext.fill();
+
+                window.segmentationContext.beginPath();
+                let mouthX = face.annotations.noseTip[0][0] - face.box[0];
+                let mouthY = face.annotations.noseTip[0][1] - face.box[1] + 50;
+                segmentationContext.rect(mouthX - 62.5, mouthY - 32.5, 125, 65);
+                window.segmentationContext.fillStyle = "green";
                 window.segmentationContext.fill();
               }
 
