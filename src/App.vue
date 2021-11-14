@@ -425,6 +425,16 @@ export default {
                 segmentationContext.rect(mouthX - 62.5, mouthY - 32.5, 125, 65);
                 window.segmentationContext.fillStyle = "green";
                 window.segmentationContext.fill();
+
+                for (let i = 0; i < imageData.data.length; i += 4) {
+                  const x = Math.floor((i / 4) % face.box[2]);
+                  const y = Math.floor(i / 4 / face.box[2]);
+
+                  const red = imageData.data[i];
+                  const green = imageData.data[i + 1];
+                  const blue = imageData.data[i + 2];
+                  const alpha = imageData.data[i + 3];
+                }
               }
 
               if (this.debugMode) {
