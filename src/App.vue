@@ -434,7 +434,22 @@ export default {
                   const green = imageData.data[i + 1];
                   const blue = imageData.data[i + 2];
                   const alpha = imageData.data[i + 3];
+
+                  //face.annotations.leftEyeIris[0][0] - face.box[1]
+                  //face.annotations.leftEyeIris[0][1] - face.box[1]
+                  if (
+                    x > leftEyeIrisX - face.box[1] / 2 &&
+                    x < leftEyeIrisX + face.box[1] / 2 &&
+                    y > leftEyeIrisY &&
+                    y < leftEyeIrisY + face.box[1]
+                  ) {
+                    imageData.data[i] = 0;
+                    imageData.data[i + 1] = 0;
+                    imageData.data[i + 2] = 255;
+                  }
                 }
+
+                window.segmentationContext.putImageData(imageData, 0, 0);
               }
 
               if (this.debugMode) {
