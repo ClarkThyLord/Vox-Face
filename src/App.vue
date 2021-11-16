@@ -438,10 +438,10 @@ export default {
                   //face.annotations.leftEyeIris[0][0] - face.box[1]
                   //face.annotations.leftEyeIris[0][1] - face.box[1]
                   if (
-                    x > leftEyeIrisX - face.box[1] / 2 &&
-                    x < leftEyeIrisX + face.box[1] / 2 &&
-                    y > leftEyeIrisY &&
-                    y < leftEyeIrisY + face.box[1]
+                    x > leftEyeIrisX - 30 &&
+                    x < leftEyeIrisX + 30 &&
+                    y > leftEyeIrisY - 30 &&
+                    y < leftEyeIrisY + 30
                   ) {
                     imageData.data[i] = 0;
                     imageData.data[i + 1] = 0;
