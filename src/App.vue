@@ -408,11 +408,11 @@ export default {
                 window.segmentationContext.beginPath();
                 let rightBrowX =
                   face.annotations.rightEyebrowUpper[3][0] - face.box[0];
-                let righBrowY =
+                let rightBrowY =
                   face.annotations.rightEyebrowUpper[3][1] - face.box[1];
                 segmentationContext.rect(
                   rightBrowX - 50,
-                  righBrowY - 25,
+                  rightBrowY - 25,
                   100,
                   50
                 );
@@ -455,6 +455,28 @@ export default {
                     imageData.data[i] = 0;
                     imageData.data[i + 1] = 0;
                     imageData.data[i + 2] = 255;
+                  }
+
+                  if (
+                    x > leftBrowX - 40 &&
+                    x < leftBrowX + 40 &&
+                    y > leftBrowY - 15 &&
+                    y < leftBrowY + 15
+                  ) {
+                    imageData.data[i] = 165;
+                    imageData.data[i + 1] = 42;
+                    imageData.data[i + 2] = 42;
+                  }
+
+                  if (
+                    x > rightBrowX - 40 &&
+                    x < rightBrowX + 40 &&
+                    y > rightBrowY - 15 &&
+                    y < rightBrowY + 15
+                  ) {
+                    imageData.data[i] = 165;
+                    imageData.data[i + 1] = 42;
+                    imageData.data[i + 2] = 42;
                   }
                 }
 
