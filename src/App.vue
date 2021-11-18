@@ -351,80 +351,28 @@ export default {
                   ")";
                 window.voxFaceMesh.material.color.set(rgb);
 
-                browLeft.material.color.set(rgb);
-                browRight.material.color.set(rgb);
-
-                eyeLeft.material.color.set(rgb);
-                eyeRight.material.color.set(rgb);
-
-                mouth.material.color.set(rgb);
-
-                window.segmentationContext.putImageData(imageData, 0, 0);
-
-                window.segmentationContext.beginPath();
                 let leftEyeIrisX =
                   face.annotations.leftEyeIris[0][0] - face.box[0];
                 let leftEyeIrisY =
                   face.annotations.leftEyeIris[0][1] - face.box[1];
-                segmentationContext.arc(
-                  leftEyeIrisX,
-                  leftEyeIrisY,
-                  50,
-                  0,
-                  2 * Math.PI
-                );
-                window.segmentationContext.fillStyle = "blue";
-                window.segmentationContext.fill();
 
-                window.segmentationContext.beginPath();
                 let rightEyeIrisX =
                   face.annotations.rightEyeIris[0][0] - face.box[0];
                 let rightEyeIrisY =
                   face.annotations.rightEyeIris[0][1] - face.box[1];
-                segmentationContext.arc(
-                  rightEyeIrisX,
-                  rightEyeIrisY,
-                  50,
-                  0,
-                  2 * Math.PI
-                );
-                window.segmentationContext.fillStyle = "blue";
-                window.segmentationContext.fill();
 
-                window.segmentationContext.beginPath();
                 let leftBrowX =
                   face.annotations.leftEyebrowUpper[3][0] - face.box[0];
                 let leftBrowY =
                   face.annotations.leftEyebrowUpper[3][1] - face.box[1];
-                segmentationContext.rect(
-                  leftBrowX - 50,
-                  leftBrowY - 25,
-                  100,
-                  50
-                );
-                window.segmentationContext.fillStyle = "brown";
-                window.segmentationContext.fill();
 
-                window.segmentationContext.beginPath();
                 let rightBrowX =
                   face.annotations.rightEyebrowUpper[3][0] - face.box[0];
                 let rightBrowY =
                   face.annotations.rightEyebrowUpper[3][1] - face.box[1];
-                segmentationContext.rect(
-                  rightBrowX - 50,
-                  rightBrowY - 25,
-                  100,
-                  50
-                );
-                window.segmentationContext.fillStyle = "brown";
-                window.segmentationContext.fill();
 
-                window.segmentationContext.beginPath();
                 let mouthX = face.annotations.noseTip[0][0] - face.box[0];
                 let mouthY = face.annotations.noseTip[0][1] - face.box[1] + 50;
-                segmentationContext.rect(mouthX - 62.5, mouthY - 32.5, 125, 65);
-                window.segmentationContext.fillStyle = "green";
-                window.segmentationContext.fill();
 
                 for (let i = 0; i < imageData.data.length; i += 4) {
                   const x = Math.floor((i / 4) % face.box[2]);
@@ -492,6 +440,14 @@ export default {
                 }
 
                 window.segmentationContext.putImageData(imageData, 0, 0);
+
+                browLeft.material.color.set(rgb);
+                browRight.material.color.set(rgb);
+
+                eyeLeft.material.color.set(rgb);
+                eyeRight.material.color.set(rgb);
+
+                mouth.material.color.set(rgb);
               }
 
               if (this.debugMode) {
