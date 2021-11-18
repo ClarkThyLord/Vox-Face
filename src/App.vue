@@ -478,6 +478,17 @@ export default {
                     imageData.data[i + 1] = 42;
                     imageData.data[i + 2] = 42;
                   }
+
+                  if (
+                    x > mouthX - 60 &&
+                    x < mouthX + 60 &&
+                    y > mouthY - 40 &&
+                    y < mouthY + 40
+                  ) {
+                    imageData.data[i] = 0;
+                    imageData.data[i + 1] = 255;
+                    imageData.data[i + 2] = 0;
+                  }
                 }
 
                 window.segmentationContext.putImageData(imageData, 0, 0);
