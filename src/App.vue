@@ -325,8 +325,8 @@ export default {
                     face.annotations.rightEyebrowUpper[3][1] - face.box[1];
 
                 let eyeLeftRT = 0,
-                  GT = 0,
-                  BT = 0,
+                  eyeLeftGT = 0,
+                  eyeLeftBT = 0,
                   eyeLeftX = face.annotations.leftEyeIris[0][0] - face.box[0],
                   eyeLeftY = face.annotations.leftEyeIris[0][1] - face.box[1];
                 let eyeRightRT = 0,
@@ -412,8 +412,13 @@ export default {
                     x > eyeLeftX - 30 &&
                     x < eyeLeftX + 30 &&
                     y > eyeLeftY - 30 &&
-                    y < eyeLeftY + 30
+                    y < eyeLeftY + 30 &&
+                    !isSkin
                   ) {
+                    eyeLeftRT += red;
+                    eyeLeftGT += green;
+                    eyeLeftBT += blue;
+
                     imageData.data[i] = 0;
                     imageData.data[i + 1] = 0;
                     imageData.data[i + 2] = 255;
@@ -424,8 +429,13 @@ export default {
                     x > eyeRightX - 30 &&
                     x < eyeRightX + 30 &&
                     y > eyeRightY - 30 &&
-                    y < eyeRightY + 30
+                    y < eyeRightY + 30 &&
+                    !isSkin
                   ) {
+                    eyeRightRT += red;
+                    eyeRightGT += green;
+                    eyeRightBT += blue;
+
                     imageData.data[i] = 0;
                     imageData.data[i + 1] = 0;
                     imageData.data[i + 2] = 255;
@@ -455,6 +465,14 @@ export default {
                 browRightRT /= imageData.data.length / 4;
                 browRightGT /= imageData.data.length / 4;
                 browRightBT /= imageData.data.length / 4;
+
+                eyeLeftRT /= imageData.data.length / 4;
+                eyeLeftGT /= imageData.data.length / 4;
+                eyeLeftBT /= imageData.data.length / 4;
+
+                eyeRightRT /= imageData.data.length / 4;
+                eyeRightGT /= imageData.data.length / 4;
+                eyeRightBT /= imageData.data.length / 4;
 
                 window.voxFaceMesh.material.color.set(
                   "rgb(" +
@@ -487,20 +505,20 @@ export default {
 
                 eyeLeft.material.color.set(
                   "rgb(" +
-                    Math.round(skinRT) +
+                    Math.round(eyeLeftRT) +
                     ", " +
-                    Math.round(skinGT) +
+                    Math.round(eyeLeftGT) +
                     ", " +
-                    Math.round(skinBT) +
+                    Math.round(eyeLeftBT) +
                     ")"
                 );
                 eyeRight.material.color.set(
                   "rgb(" +
-                    Math.round(skinRT) +
+                    Math.round(eyeRightRT) +
                     ", " +
-                    Math.round(skinGT) +
+                    Math.round(eyeRightGT) +
                     ", " +
-                    Math.round(skinBT) +
+                    Math.round(eyeRightBT) +
                     ")"
                 );
 
