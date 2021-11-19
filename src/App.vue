@@ -446,8 +446,13 @@ export default {
                     x > mouthX - 60 &&
                     x < mouthX + 60 &&
                     y > mouthY - 40 &&
-                    y < mouthY + 40
+                    y < mouthY + 40 &&
+                    !isSkin
                   ) {
+                    mouthRT += red;
+                    mouthGT += green;
+                    mouthBT += blue;
+
                     imageData.data[i] = 0;
                     imageData.data[i + 1] = 255;
                     imageData.data[i + 2] = 0;
@@ -473,6 +478,10 @@ export default {
                 eyeRightRT /= imageData.data.length / 4;
                 eyeRightGT /= imageData.data.length / 4;
                 eyeRightBT /= imageData.data.length / 4;
+
+                mouthRT /= imageData.data.length / 4;
+                mouthGT /= imageData.data.length / 4;
+                mouthBT /= imageData.data.length / 4;
 
                 window.voxFaceMesh.material.color.set(
                   "rgb(" +
@@ -524,11 +533,11 @@ export default {
 
                 mouth.material.color.set(
                   "rgb(" +
-                    Math.round(skinRT) +
+                    Math.round(mouthRT) +
                     ", " +
-                    Math.round(skinGT) +
+                    Math.round(mouthGT) +
                     ", " +
-                    Math.round(skinBT) +
+                    Math.round(mouthBT) +
                     ")"
                 );
 
