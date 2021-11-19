@@ -356,14 +356,14 @@ export default {
                   const Cb = (blue - Y) * 0.564 + delta;
 
                   // SKIN
-                  if (
+                  const isSkin =
                     Y >= 0.0 &&
                     Y <= 235.0 &&
                     Cr >= 133.0 &&
                     Cr <= 173.0 &&
                     Cb >= 77.0 &&
-                    Cb <= 127.0
-                  ) {
+                    Cb <= 127.0;
+                  if (isSkin) {
                     skinRT += red;
                     skinGT += green;
                     skinBT += blue;
@@ -378,8 +378,13 @@ export default {
                     x > browLeftX - 40 &&
                     x < browLeftX + 40 &&
                     y > browLeftY - 15 &&
-                    y < browLeftY + 15
+                    y < browLeftY + 15 &&
+                    !isSkin
                   ) {
+                    browLeftRT += red;
+                    browLeftGT += green;
+                    browLeftBT += blue;
+
                     imageData.data[i] = 165;
                     imageData.data[i + 1] = 42;
                     imageData.data[i + 2] = 42;
@@ -390,8 +395,13 @@ export default {
                     x > browRightX - 40 &&
                     x < browRightX + 40 &&
                     y > browRightY - 15 &&
-                    y < browRightY + 15
+                    y < browRightY + 15 &&
+                    !isSkin
                   ) {
+                    browRightRT += red;
+                    browRightGT += green;
+                    browRightBT += blue;
+
                     imageData.data[i] = 165;
                     imageData.data[i + 1] = 42;
                     imageData.data[i + 2] = 42;
@@ -438,6 +448,14 @@ export default {
                 skinGT /= imageData.data.length / 4;
                 skinBT /= imageData.data.length / 4;
 
+                browLeftRT /= imageData.data.length / 4;
+                browLeftGT /= imageData.data.length / 4;
+                browLeftBT /= imageData.data.length / 4;
+
+                browRightRT /= imageData.data.length / 4;
+                browRightGT /= imageData.data.length / 4;
+                browRightBT /= imageData.data.length / 4;
+
                 window.voxFaceMesh.material.color.set(
                   "rgb(" +
                     Math.round(skinRT) +
@@ -450,20 +468,20 @@ export default {
 
                 browLeft.material.color.set(
                   "rgb(" +
-                    Math.round(skinRT) +
+                    Math.round(browLeftRT) +
                     ", " +
-                    Math.round(skinGT) +
+                    Math.round(browLeftGT) +
                     ", " +
-                    Math.round(skinBT) +
+                    Math.round(browLeftBT) +
                     ")"
                 );
                 browRight.material.color.set(
                   "rgb(" +
-                    Math.round(skinRT) +
+                    Math.round(browRightRT) +
                     ", " +
-                    Math.round(skinGT) +
+                    Math.round(browRightGT) +
                     ", " +
-                    Math.round(skinBT) +
+                    Math.round(browRightBT) +
                     ")"
                 );
 
