@@ -305,74 +305,41 @@ export default {
                   window.segmentationCanvas.height
                 );
 
-                let rT = 0,
-                  gT = 0,
-                  bT = 0;
-                for (let i = 0; i < imageData.data.length; i += 4) {
-                  const red = imageData.data[i];
-                  const green = imageData.data[i + 1];
-                  const blue = imageData.data[i + 2];
-                  const alpha = imageData.data[i + 3];
+                let skinRT = 0,
+                  skinGT = 0,
+                  skinBT = 0;
 
-                  const delta = 128;
-                  const Y = 0.299 * red + 0.587 * green + 0.114 * blue;
-                  const Cr = (red - Y) * 0.713 + delta;
-                  const Cb = (blue - Y) * 0.564 + delta;
+                let browLeftRT = 0,
+                  browLeftGT = 0,
+                  browLeftBT = 0,
+                  browLeftX =
+                    face.annotations.leftEyebrowUpper[3][0] - face.box[0],
+                  browLeftY =
+                    face.annotations.leftEyebrowUpper[3][1] - face.box[1];
+                let browRightRT = 0,
+                  browRightGT = 0,
+                  browRightBT = 0,
+                  browRightX =
+                    face.annotations.rightEyebrowUpper[3][0] - face.box[0],
+                  browRightY =
+                    face.annotations.rightEyebrowUpper[3][1] - face.box[1];
 
-                  if (
-                    Y >= 0.0 &&
-                    Y <= 235.0 &&
-                    Cr >= 133.0 &&
-                    Cr <= 173.0 &&
-                    Cb >= 77.0 &&
-                    Cb <= 127.0
-                  ) {
-                    rT += red;
-                    gT += green;
-                    bT += blue;
+                let eyeLeftRT = 0,
+                  GT = 0,
+                  BT = 0,
+                  eyeLeftX = face.annotations.leftEyeIris[0][0] - face.box[0],
+                  eyeLeftY = face.annotations.leftEyeIris[0][1] - face.box[1];
+                let eyeRightRT = 0,
+                  eyeRightGT = 0,
+                  eyeRightBT = 0,
+                  eyeRightX = face.annotations.rightEyeIris[0][0] - face.box[0],
+                  eyeRightY = face.annotations.rightEyeIris[0][1] - face.box[1];
 
-                    imageData.data[i] = 255;
-                    imageData.data[i + 1] = 0;
-                    imageData.data[i + 2] = 0;
-                  }
-                }
-
-                rT /= imageData.data.length / 4;
-                gT /= imageData.data.length / 4;
-                bT /= imageData.data.length / 4;
-
-                const rgb =
-                  "rgb(" +
-                  Math.round(rT) +
-                  ", " +
-                  Math.round(gT) +
-                  ", " +
-                  Math.round(bT) +
-                  ")";
-                window.voxFaceMesh.material.color.set(rgb);
-
-                let leftEyeIrisX =
-                  face.annotations.leftEyeIris[0][0] - face.box[0];
-                let leftEyeIrisY =
-                  face.annotations.leftEyeIris[0][1] - face.box[1];
-
-                let rightEyeIrisX =
-                  face.annotations.rightEyeIris[0][0] - face.box[0];
-                let rightEyeIrisY =
-                  face.annotations.rightEyeIris[0][1] - face.box[1];
-
-                let leftBrowX =
-                  face.annotations.leftEyebrowUpper[3][0] - face.box[0];
-                let leftBrowY =
-                  face.annotations.leftEyebrowUpper[3][1] - face.box[1];
-
-                let rightBrowX =
-                  face.annotations.rightEyebrowUpper[3][0] - face.box[0];
-                let rightBrowY =
-                  face.annotations.rightEyebrowUpper[3][1] - face.box[1];
-
-                let mouthX = face.annotations.noseTip[0][0] - face.box[0];
-                let mouthY = face.annotations.noseTip[0][1] - face.box[1] + 50;
+                let mouthRT = 0,
+                  mouthGT = 0,
+                  mouthBT = 0,
+                  mouthX = face.annotations.noseTip[0][0] - face.box[0],
+                  mouthY = face.annotations.noseTip[0][1] - face.box[1] + 50;
 
                 for (let i = 0; i < imageData.data.length; i += 4) {
                   const x = Math.floor((i / 4) % face.box[2]);
@@ -383,50 +350,78 @@ export default {
                   const blue = imageData.data[i + 2];
                   const alpha = imageData.data[i + 3];
 
+                  const delta = 128;
+                  const Y = 0.299 * red + 0.587 * green + 0.114 * blue;
+                  const Cr = (red - Y) * 0.713 + delta;
+                  const Cb = (blue - Y) * 0.564 + delta;
+
+                  // SKIN
                   if (
-                    x > leftEyeIrisX - 30 &&
-                    x < leftEyeIrisX + 30 &&
-                    y > leftEyeIrisY - 30 &&
-                    y < leftEyeIrisY + 30
+                    Y >= 0.0 &&
+                    Y <= 235.0 &&
+                    Cr >= 133.0 &&
+                    Cr <= 173.0 &&
+                    Cb >= 77.0 &&
+                    Cb <= 127.0
                   ) {
-                    imageData.data[i] = 0;
+                    skinRT += red;
+                    skinGT += green;
+                    skinBT += blue;
+
+                    imageData.data[i] = 255;
                     imageData.data[i + 1] = 0;
-                    imageData.data[i + 2] = 255;
+                    imageData.data[i + 2] = 0;
                   }
 
+                  // BROW LEFT
                   if (
-                    x > rightEyeIrisX - 30 &&
-                    x < rightEyeIrisX + 30 &&
-                    y > rightEyeIrisY - 30 &&
-                    y < rightEyeIrisY + 30
-                  ) {
-                    imageData.data[i] = 0;
-                    imageData.data[i + 1] = 0;
-                    imageData.data[i + 2] = 255;
-                  }
-
-                  if (
-                    x > leftBrowX - 40 &&
-                    x < leftBrowX + 40 &&
-                    y > leftBrowY - 15 &&
-                    y < leftBrowY + 15
+                    x > browLeftX - 40 &&
+                    x < browLeftX + 40 &&
+                    y > browLeftY - 15 &&
+                    y < browLeftY + 15
                   ) {
                     imageData.data[i] = 165;
                     imageData.data[i + 1] = 42;
                     imageData.data[i + 2] = 42;
                   }
 
+                  // BROW RIGHT
                   if (
-                    x > rightBrowX - 40 &&
-                    x < rightBrowX + 40 &&
-                    y > rightBrowY - 15 &&
-                    y < rightBrowY + 15
+                    x > browRightX - 40 &&
+                    x < browRightX + 40 &&
+                    y > browRightY - 15 &&
+                    y < browRightY + 15
                   ) {
                     imageData.data[i] = 165;
                     imageData.data[i + 1] = 42;
                     imageData.data[i + 2] = 42;
                   }
 
+                  // EYE LEFT
+                  if (
+                    x > eyeLeftX - 30 &&
+                    x < eyeLeftX + 30 &&
+                    y > eyeLeftY - 30 &&
+                    y < eyeLeftY + 30
+                  ) {
+                    imageData.data[i] = 0;
+                    imageData.data[i + 1] = 0;
+                    imageData.data[i + 2] = 255;
+                  }
+
+                  // EYE RIGHT
+                  if (
+                    x > eyeRightX - 30 &&
+                    x < eyeRightX + 30 &&
+                    y > eyeRightY - 30 &&
+                    y < eyeRightY + 30
+                  ) {
+                    imageData.data[i] = 0;
+                    imageData.data[i + 1] = 0;
+                    imageData.data[i + 2] = 255;
+                  }
+
+                  // MOUTH
                   if (
                     x > mouthX - 60 &&
                     x < mouthX + 60 &&
@@ -439,15 +434,69 @@ export default {
                   }
                 }
 
+                skinRT /= imageData.data.length / 4;
+                skinGT /= imageData.data.length / 4;
+                skinBT /= imageData.data.length / 4;
+
+                window.voxFaceMesh.material.color.set(
+                  "rgb(" +
+                    Math.round(skinRT) +
+                    ", " +
+                    Math.round(skinGT) +
+                    ", " +
+                    Math.round(skinBT) +
+                    ")"
+                );
+
+                browLeft.material.color.set(
+                  "rgb(" +
+                    Math.round(skinRT) +
+                    ", " +
+                    Math.round(skinGT) +
+                    ", " +
+                    Math.round(skinBT) +
+                    ")"
+                );
+                browRight.material.color.set(
+                  "rgb(" +
+                    Math.round(skinRT) +
+                    ", " +
+                    Math.round(skinGT) +
+                    ", " +
+                    Math.round(skinBT) +
+                    ")"
+                );
+
+                eyeLeft.material.color.set(
+                  "rgb(" +
+                    Math.round(skinRT) +
+                    ", " +
+                    Math.round(skinGT) +
+                    ", " +
+                    Math.round(skinBT) +
+                    ")"
+                );
+                eyeRight.material.color.set(
+                  "rgb(" +
+                    Math.round(skinRT) +
+                    ", " +
+                    Math.round(skinGT) +
+                    ", " +
+                    Math.round(skinBT) +
+                    ")"
+                );
+
+                mouth.material.color.set(
+                  "rgb(" +
+                    Math.round(skinRT) +
+                    ", " +
+                    Math.round(skinGT) +
+                    ", " +
+                    Math.round(skinBT) +
+                    ")"
+                );
+
                 window.segmentationContext.putImageData(imageData, 0, 0);
-
-                browLeft.material.color.set(rgb);
-                browRight.material.color.set(rgb);
-
-                eyeLeft.material.color.set(rgb);
-                eyeRight.material.color.set(rgb);
-
-                mouth.material.color.set(rgb);
               }
 
               if (this.debugMode) {
