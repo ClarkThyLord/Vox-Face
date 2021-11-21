@@ -413,7 +413,8 @@ export default {
                     x < eyeLeftX + 30 &&
                     y > eyeLeftY - 30 &&
                     y < eyeLeftY + 30 &&
-                    !isSkin
+                    !isSkin &&
+                    Y < 50
                   ) {
                     eyeLeftRT += red;
                     eyeLeftGT += green;
@@ -430,7 +431,8 @@ export default {
                     x < eyeRightX + 30 &&
                     y > eyeRightY - 30 &&
                     y < eyeRightY + 30 &&
-                    !isSkin
+                    !isSkin &&
+                    Y < 50
                   ) {
                     eyeRightRT += red;
                     eyeRightGT += green;
