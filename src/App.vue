@@ -345,9 +345,9 @@ export default {
                   const x = Math.floor((i / 4) % face.box[2]);
                   const y = Math.floor(i / 4 / face.box[2]);
 
-                  const red = imageData.data[i] + 25;
-                  const green = imageData.data[i + 1] + 25;
-                  const blue = imageData.data[i + 2] + 25;
+                  const red = imageData.data[i] + 30;
+                  const green = imageData.data[i + 1] + 30;
+                  const blue = imageData.data[i + 2] + 30;
                   const alpha = imageData.data[i + 3];
 
                   const delta = 128;
@@ -373,12 +373,14 @@ export default {
                     imageData.data[i + 2] = 0;
                   }
 
+                  let isBrow = false;
+
                   // BROW LEFT
                   if (
-                    x > browLeftX - 40 &&
-                    x < browLeftX + 40 &&
-                    y > browLeftY - 15 &&
-                    y < browLeftY + 15 &&
+                    x > browLeftX - 30 &&
+                    x < browLeftX + 50 &&
+                    y > browLeftY - 5 &&
+                    y < browLeftY + 25 &&
                     !isSkin
                   ) {
                     browLeftRT += red;
@@ -388,14 +390,16 @@ export default {
                     imageData.data[i] = 165;
                     imageData.data[i + 1] = 42;
                     imageData.data[i + 2] = 42;
+
+                    isBrow = true;
                   }
 
                   // BROW RIGHT
                   if (
-                    x > browRightX - 40 &&
-                    x < browRightX + 40 &&
-                    y > browRightY - 15 &&
-                    y < browRightY + 15 &&
+                    x > browRightX - 30 &&
+                    x < browRightX + 50 &&
+                    y > browRightY - 5 &&
+                    y < browRightY + 25 &&
                     !isSkin
                   ) {
                     browRightRT += red;
@@ -405,7 +409,11 @@ export default {
                     imageData.data[i] = 165;
                     imageData.data[i + 1] = 42;
                     imageData.data[i + 2] = 42;
+
+                    isBrow = true;
                   }
+
+                  const isEye = (red + green + blue) / 3 < 145;
 
                   // EYE LEFT
                   if (
@@ -414,7 +422,8 @@ export default {
                     y > eyeLeftY - 30 &&
                     y < eyeLeftY + 30 &&
                     !isSkin &&
-                    Y < 50
+                    !isBrow &&
+                    isEye
                   ) {
                     eyeLeftRT += red;
                     eyeLeftGT += green;
@@ -432,7 +441,8 @@ export default {
                     y > eyeRightY - 30 &&
                     y < eyeRightY + 30 &&
                     !isSkin &&
-                    Y < 50
+                    !isBrow &&
+                    isEye
                   ) {
                     eyeRightRT += red;
                     eyeRightGT += green;
