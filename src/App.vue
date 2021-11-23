@@ -377,15 +377,21 @@ export default {
 
                   // BROW LEFT
                   if (
-                    x > browLeftX - 30 &&
-                    x < browLeftX + 50 &&
+                    x > browLeftX - 50 &&
+                    x < browLeftX + 30 &&
                     y > browLeftY - 5 &&
                     y < browLeftY + 25 &&
                     !isSkin
                   ) {
-                    browLeftRT += red;
-                    browLeftGT += green;
-                    browLeftBT += blue;
+                    if (
+                      red < browLeftRT &&
+                      green < browLeftGT &&
+                      blue < browLeftBT
+                    ) {
+                      browLeftRT = red;
+                      browLeftGT = green;
+                      browLeftBT = blue;
+                    }
 
                     imageData.data[i] = 165;
                     imageData.data[i + 1] = 42;
@@ -402,9 +408,15 @@ export default {
                     y < browRightY + 25 &&
                     !isSkin
                   ) {
-                    browRightRT += red;
-                    browRightGT += green;
-                    browRightBT += blue;
+                    if (
+                      red < browRightRT &&
+                      green < browRightGT &&
+                      blue < browRightBT
+                    ) {
+                      browRightRT = red;
+                      browRightGT = green;
+                      browRightBT = blue;
+                    }
 
                     imageData.data[i] = 165;
                     imageData.data[i + 1] = 42;
@@ -425,9 +437,15 @@ export default {
                     !isBrow &&
                     isEye
                   ) {
-                    eyeLeftRT += red;
-                    eyeLeftGT += green;
-                    eyeLeftBT += blue;
+                    if (
+                      red < eyeLeftRT &&
+                      green < eyeLeftGT &&
+                      blue < eyeLeftBT
+                    ) {
+                      eyeLeftRT = red;
+                      eyeLeftGT = green;
+                      eyeLeftBT = blue;
+                    }
 
                     imageData.data[i] = 0;
                     imageData.data[i + 1] = 0;
@@ -444,9 +462,15 @@ export default {
                     !isBrow &&
                     isEye
                   ) {
-                    eyeRightRT += red;
-                    eyeRightGT += green;
-                    eyeRightBT += blue;
+                    if (
+                      red < eyeRightRT &&
+                      green < eyeRightGT &&
+                      blue < eyeRightBT
+                    ) {
+                      eyeRightRT = red;
+                      eyeRightGT = green;
+                      eyeRightBT = blue;
+                    }
 
                     imageData.data[i] = 0;
                     imageData.data[i + 1] = 0;
@@ -461,9 +485,11 @@ export default {
                     y < mouthY + 40 &&
                     !isSkin
                   ) {
-                    mouthRT += red;
-                    mouthGT += green;
-                    mouthBT += blue;
+                    if (red > mouthRT) {
+                      mouthRT = red;
+                      mouthGT = green;
+                      mouthBT = blue;
+                    }
 
                     imageData.data[i] = 0;
                     imageData.data[i + 1] = 255;
@@ -475,25 +501,25 @@ export default {
                 skinGT /= imageData.data.length / 4;
                 skinBT /= imageData.data.length / 4;
 
-                browLeftRT /= imageData.data.length / 4;
-                browLeftGT /= imageData.data.length / 4;
-                browLeftBT /= imageData.data.length / 4;
+                // browLeftRT /= imageData.data.length / 4;
+                // browLeftGT /= imageData.data.length / 4;
+                // browLeftBT /= imageData.data.length / 4;
 
-                browRightRT /= imageData.data.length / 4;
-                browRightGT /= imageData.data.length / 4;
-                browRightBT /= imageData.data.length / 4;
+                // browRightRT /= imageData.data.length / 4;
+                // browRightGT /= imageData.data.length / 4;
+                // browRightBT /= imageData.data.length / 4;
 
-                eyeLeftRT /= imageData.data.length / 4;
-                eyeLeftGT /= imageData.data.length / 4;
-                eyeLeftBT /= imageData.data.length / 4;
+                // eyeLeftRT /= imageData.data.length / 4;
+                // eyeLeftGT /= imageData.data.length / 4;
+                // eyeLeftBT /= imageData.data.length / 4;
 
-                eyeRightRT /= imageData.data.length / 4;
-                eyeRightGT /= imageData.data.length / 4;
-                eyeRightBT /= imageData.data.length / 4;
+                // eyeRightRT /= imageData.data.length / 4;
+                // eyeRightGT /= imageData.data.length / 4;
+                // eyeRightBT /= imageData.data.length / 4;
 
-                mouthRT /= imageData.data.length / 4;
-                mouthGT /= imageData.data.length / 4;
-                mouthBT /= imageData.data.length / 4;
+                // mouthRT /= imageData.data.length / 4;
+                // mouthGT /= imageData.data.length / 4;
+                // mouthBT /= imageData.data.length / 4;
 
                 window.voxFaceMesh.material.color.set(
                   "rgb(" +
