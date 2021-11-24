@@ -304,6 +304,12 @@ export default {
                   window.segmentationCanvas.width,
                   window.segmentationCanvas.height
                 );
+                const imageSegmented = window.segmentationContext.getImageData(
+                  0,
+                  0,
+                  window.segmentationCanvas.width,
+                  window.segmentationCanvas.height
+                );
 
                 let skinRT = 0,
                   skinGT = 0,
@@ -327,13 +333,19 @@ export default {
                 let eyeLeftRT = 0,
                   eyeLeftGT = 0,
                   eyeLeftBT = 0,
-                  eyeLeftX = face.annotations.leftEyeIris[0][0] - face.box[0],
-                  eyeLeftY = face.annotations.leftEyeIris[0][1] - face.box[1];
+                  eyeLeftX = face.mesh[386][0] - face.box[0],
+                  eyeLeftY =
+                    face.mesh[374][1] +
+                    (face.mesh[386][1] - face.mesh[374][1]) -
+                    face.box[1];
                 let eyeRightRT = 0,
                   eyeRightGT = 0,
                   eyeRightBT = 0,
-                  eyeRightX = face.annotations.rightEyeIris[0][0] - face.box[0],
-                  eyeRightY = face.annotations.rightEyeIris[0][1] - face.box[1];
+                  eyeRightX = face.mesh[159][0] - face.box[0],
+                  eyeRightY =
+                    face.mesh[145][1] +
+                    (face.mesh[159][1] - face.mesh[145][1]) -
+                    face.box[1];
 
                 let mouthRT = 0,
                   mouthGT = 0,
@@ -368,9 +380,9 @@ export default {
                     skinGT += green;
                     skinBT += blue;
 
-                    imageData.data[i] = 255;
-                    imageData.data[i + 1] = 0;
-                    imageData.data[i + 2] = 0;
+                    imageSegmented.data[i] = 255;
+                    imageSegmented.data[i + 1] = 0;
+                    imageSegmented.data[i + 2] = 0;
                   }
 
                   let isBrow = false;
@@ -393,9 +405,9 @@ export default {
                       browLeftBT = blue;
                     }
 
-                    imageData.data[i] = 165;
-                    imageData.data[i + 1] = 42;
-                    imageData.data[i + 2] = 42;
+                    imageSegmented.data[i] = 165;
+                    imageSegmented.data[i + 1] = 42;
+                    imageSegmented.data[i + 2] = 42;
 
                     isBrow = true;
                   }
@@ -418,9 +430,9 @@ export default {
                       browRightBT = blue;
                     }
 
-                    imageData.data[i] = 165;
-                    imageData.data[i + 1] = 42;
-                    imageData.data[i + 2] = 42;
+                    imageSegmented.data[i] = 165;
+                    imageSegmented.data[i + 1] = 42;
+                    imageSegmented.data[i + 2] = 42;
 
                     isBrow = true;
                   }
@@ -447,9 +459,9 @@ export default {
                       eyeLeftBT = blue;
                     }
 
-                    imageData.data[i] = 0;
-                    imageData.data[i + 1] = 0;
-                    imageData.data[i + 2] = 255;
+                    imageSegmented.data[i] = 0;
+                    imageSegmented.data[i + 1] = 0;
+                    imageSegmented.data[i + 2] = 255;
                   }
 
                   // EYE RIGHT
@@ -472,9 +484,9 @@ export default {
                       eyeRightBT = blue;
                     }
 
-                    imageData.data[i] = 0;
-                    imageData.data[i + 1] = 0;
-                    imageData.data[i + 2] = 255;
+                    imageSegmented.data[i] = 0;
+                    imageSegmented.data[i + 1] = 0;
+                    imageSegmented.data[i + 2] = 255;
                   }
 
                   // MOUTH
@@ -491,35 +503,15 @@ export default {
                       mouthBT = blue;
                     }
 
-                    imageData.data[i] = 0;
-                    imageData.data[i + 1] = 255;
-                    imageData.data[i + 2] = 0;
+                    imageSegmented.data[i] = 0;
+                    imageSegmented.data[i + 1] = 255;
+                    imageSegmented.data[i + 2] = 0;
                   }
                 }
 
                 skinRT /= imageData.data.length / 4;
                 skinGT /= imageData.data.length / 4;
                 skinBT /= imageData.data.length / 4;
-
-                // browLeftRT /= imageData.data.length / 4;
-                // browLeftGT /= imageData.data.length / 4;
-                // browLeftBT /= imageData.data.length / 4;
-
-                // browRightRT /= imageData.data.length / 4;
-                // browRightGT /= imageData.data.length / 4;
-                // browRightBT /= imageData.data.length / 4;
-
-                // eyeLeftRT /= imageData.data.length / 4;
-                // eyeLeftGT /= imageData.data.length / 4;
-                // eyeLeftBT /= imageData.data.length / 4;
-
-                // eyeRightRT /= imageData.data.length / 4;
-                // eyeRightGT /= imageData.data.length / 4;
-                // eyeRightBT /= imageData.data.length / 4;
-
-                // mouthRT /= imageData.data.length / 4;
-                // mouthGT /= imageData.data.length / 4;
-                // mouthBT /= imageData.data.length / 4;
 
                 window.voxFaceMesh.material.color.set(
                   "rgb(" +
@@ -579,7 +571,7 @@ export default {
                     ")"
                 );
 
-                window.segmentationContext.putImageData(imageData, 0, 0);
+                window.segmentationContext.putImageData(imageSegmented, 0, 0);
               }
 
               if (this.debugMode) {
