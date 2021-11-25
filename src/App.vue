@@ -491,10 +491,10 @@ export default {
 
                   // MOUTH
                   if (
-                    x > mouthX - 60 &&
-                    x < mouthX + 60 &&
-                    y > mouthY - 40 &&
-                    y < mouthY + 40 &&
+                    x > mouthX - 50 &&
+                    x < mouthX + 50 &&
+                    y > mouthY - 10 &&
+                    y < mouthY + 10 &&
                     !isSkin
                   ) {
                     if (red > mouthRT) {
