@@ -1,5 +1,5 @@
 <p align="center">
-	<a>
+	<a href="https://github.com/ClarkThyLord/Vox-Face">
 		<img width="128px" src="./public/vox-face.svg?sanitize=true" alt="" />
 		<h1 align="center">
 			Vox-Face
@@ -10,7 +10,7 @@
 
 <p align="center">
 	<a href="https://github.com/ClarkThyLord/Vox-Face/releases">
-		<img src="https://img.shields.io/badge/Version-0.5.0-green.svg" alt="Version">
+		<img src="https://img.shields.io/badge/Version-1.0.0-green.svg" alt="Version">
 	</a>
 	<a href="https://github.com/ClarkThyLord/Vox-Face/blob/master/LICENSE">
 		<img src="https://img.shields.io/badge/License-MIT-brightgreen.svg" alt="License">
